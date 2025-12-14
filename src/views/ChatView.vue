@@ -123,12 +123,12 @@ async function handleSend(data) {
         buffer = buffer.slice(newlineIndex + 2)
 
         const lines = message.split('\n');
-        let eventType = 'message'
+        let eventType = ''
         let eventData = []
 
         for (const line of lines) {
           if (line.startsWith('event:')) {
-            eventType = line.slice(6).trim() || 'message'
+            eventType = line.slice(6).trim()
           } else if (line.startsWith('data:')) {
             eventData.push(line.slice(5))
           }
