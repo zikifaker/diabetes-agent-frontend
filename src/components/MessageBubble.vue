@@ -54,7 +54,7 @@
 
       <transition name="fade-in">
         <div v-if="message.content" class="message-content-wrapper">
-          <div class="message-text" v-html="renderMarkdown(message.content)"></div>
+          <div class="message-text markdown-body" v-html="renderMarkdown(message.content)"></div>
         </div>
       </transition>
 
@@ -172,20 +172,53 @@ function renderMarkdown(content) {
 
 .message-text {
   font-size: 15px;
-  line-height: 1.3;
   color: var(--text-primary);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  text-align: left;
-  font-family:
-    "PingFang SC",
-    "Microsoft YaHei",
-    "Hiragino Sans GB",
-    "WenQuanYi Micro Hei",
-    "Noto Sans CJK SC",
-    "Source Han Sans SC",
-    "Noto Sans SC",
-    sans-serif;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 2.5;
+}
+
+.markdown-body > * {
+  margin-top: 0.55em;
+  margin-bottom: 0.55em;
+}
+
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 0.95em;
+  margin-bottom: 0.4em;
+}
+
+.markdown-body h1 + p,
+.markdown-body h2 + p,
+.markdown-body h3 + p {
+  margin-top: 0.3em;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin-top: 0.45em;
+  margin-bottom: 0.45em;
+}
+
+.markdown-body li {
+  margin: 0.25em 0;
+}
+
+.markdown-body li > p {
+  margin: 0.25em 0;
 }
 
 .typing-indicator {
