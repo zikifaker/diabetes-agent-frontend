@@ -183,8 +183,8 @@ onMounted(() => {
 }
 
 .input-pill:focus-within {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  border-color: #909090;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 .input-content {
