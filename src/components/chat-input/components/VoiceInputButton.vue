@@ -5,18 +5,21 @@
         {{ error }}
       </div>
     </transition>
-    <button @click="toggleVoiceInput" class="btn-voice" :class="{ 'listening': isListening }"
-      :title="isListening ? '停止语音输入' : '语音输入'" :aria-label="isListening ? '停止语音输入' : '开始语音输入'" :disabled="!isSupported">
-      <span v-if="isListening" class="pulse-animation"></span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M12 1C10.34 1 9 2.34 9 4V12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12V4C15 2.34 13.66 1 12 1Z"
-          :fill="isListening ? '#ef4444' : 'currentColor'" :style="{ transition: 'fill 0.3s ease' }" />
-        <path
-          d="M17 11C17 14.31 14.31 17 11 17H13C13 17 13 17 13 17M7 11C7 14.31 9.69 17 13 17H11C11 17 11 17 11 17M12 17V21M8 21H16"
-          :stroke="isListening ? '#ef4444' : 'currentColor'" stroke-width="1.5" stroke-linecap="round"
-          :style="{ transition: 'stroke 0.3s ease' }" />
-      </svg>
-    </button>
+    <div class="tooltip-container">
+      <button @click="toggleVoiceInput" class="btn-voice" :class="{ 'listening': isListening }"
+        :aria-label="isListening ? '停止语音输入' : '开始语音输入'" :disabled="!isSupported">
+        <span v-if="isListening" class="pulse-animation"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 1C10.34 1 9 2.34 9 4V12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12V4C15 2.34 13.66 1 12 1Z"
+            :fill="isListening ? '#ef4444' : 'currentColor'" :style="{ transition: 'fill 0.3s ease' }" />
+          <path
+            d="M17 11C17 14.31 14.31 17 11 17H13C13 17 13 17 13 17M7 11C7 14.31 9.69 17 13 17H11C11 17 11 17 11 17M12 17V21M8 21H16"
+            :stroke="isListening ? '#ef4444' : 'currentColor'" stroke-width="1.5" stroke-linecap="round"
+            :style="{ transition: 'stroke 0.3s ease' }" />
+        </svg>
+        <span class="tooltip">{{ isListening ? '停止语音输入' : '语音输入' }}</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -230,45 +233,115 @@ watch(() => props.isListening, (newVal) => {
 .voice-input-container {
   position: relative;
   display: inline-block;
+  line-height: 0;
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: auto;
+  min-width: 60px;
+  background-color: var(--color-tooltip-bg, #333);
+  color: var(--color-tooltip-text, #fff);
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  opacity: 0;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-tooltip-bg, #333) transparent transparent transparent;
+  }
+}
+
+.pulse-animation {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(239, 68, 68, 0.2);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
 }
 
 .btn-voice {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  color: #4b5563;
+  border: none;
+  cursor: pointer;
   transition: all 0.2s ease;
-}
+  background: none;
+  color: var(--color-text);
+  padding: 8px;
 
-.btn-voice:hover:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.05);
-}
+  &:hover:not(:disabled) {
+    background-color: var(--color-hover-bg);
+    transform: translateY(-1px);
+  }
 
-.btn-voice:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 
-.btn-voice.listening {
-  color: #ef4444;
-  animation: pulse 1.5s infinite;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.listening {
+    color: #ef4444;
+  }
+
+  &:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
   }
 
   70% {
-    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
   }
 
   100% {
