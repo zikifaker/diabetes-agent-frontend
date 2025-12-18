@@ -212,27 +212,35 @@ function isNearBottom(el, threshold = 20) {
 }
 
 onMounted(async () => {
-  const sessionId = route.params.id
-  if (sessionId) {
-    await sessionStore.fetchMessages(sessionId)
-    const session = sessionStore.sessions.find(s => s.id == sessionId)
-    if (session) {
-      sessionStore.setCurrentSession(session)
+  try {
+    const sessionId = route.params.id
+    if (sessionId) {
+      await sessionStore.fetchMessages(sessionId)
+      const session = sessionStore.sessions.find(s => s.id == sessionId)
+      if (session) {
+        sessionStore.setCurrentSession(session)
+      }
+      await nextTick()
+      scrollToBottom()
     }
-    await nextTick()
-    scrollToBottom()
+  } catch (error) {
+    console.error('Error fetching session messages:', error)
   }
 })
 
 watch(() => route.params.id, async (newId) => {
-  if (newId) {
-    await sessionStore.fetchMessages(newId)
-    const session = sessionStore.sessions.find(s => s.id == newId)
-    if (session) {
-      sessionStore.setCurrentSession(session)
+  try {
+    if (newId) {
+      await sessionStore.fetchMessages(newId)
+      const session = sessionStore.sessions.find(s => s.id == newId)
+      if (session) {
+        sessionStore.setCurrentSession(session)
+      }
+      await nextTick()
+      scrollToBottom()
     }
-    await nextTick()
-    scrollToBottom()
+  } catch (error) {
+    console.error('Error fetching session messages:', error)
   }
 })
 </script>

@@ -64,6 +64,12 @@ function handleClickOutside(event) {
   }
 }
 
+function handleEscape(event) {
+  if (event.key === 'Escape') {
+    showDropdown.value = false
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('keydown', handleEscape)
@@ -73,12 +79,6 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
   document.removeEventListener('keydown', handleEscape)
 })
-
-function handleEscape(event) {
-  if (event.key === 'Escape') {
-    showDropdown.value = false
-  }
-}
 
 watch(() => props.modelValue, (newVal) => {
   if (newVal.id !== selectedLLM.value.id) {

@@ -175,8 +175,6 @@ onMounted(() => {
   padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
-  position: relative;
-  z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -195,15 +193,9 @@ onMounted(() => {
   flex: 1;
 }
 
-.llm-desc {
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
 .message-input {
   width: 100%;
-  padding: 0;
+  padding: 4px 0;
   margin: 0;
   border: none;
   background: transparent;
@@ -217,7 +209,6 @@ onMounted(() => {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
-  padding: 4px 0;
 }
 
 .message-input::placeholder {
@@ -247,7 +238,6 @@ onMounted(() => {
   gap: 12px;
 }
 
-.btn-voice,
 .btn-send,
 .btn-config {
   width: 32px;
@@ -274,68 +264,14 @@ onMounted(() => {
   opacity: 0.6;
 }
 
-.btn-voice:hover,
 .btn-config:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.btn-llm:focus,
-.btn-config:focus,
-.btn-voice:focus,
-.btn-send:focus {
+.btn-send:focus,
+.btn-config:focus {
   outline: none;
   box-shadow: none;
-}
-
-.btn-voice {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.btn-voice:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.btn-voice.listening {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.pulse-animation {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(239, 68, 68, 0.2);
-  animation: pulse 1.5s infinite;
-  z-index: 1;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-
-  70% {
-    transform: scale(1.3);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
 }
 
 @media (max-width: 768px) {
@@ -351,17 +287,6 @@ onMounted(() => {
     padding: 6px 8px;
   }
 
-  .llm-dropdown {
-    width: 240px;
-  }
-
-  .btn-llm {
-    padding: 2px 8px;
-    font-size: 12px;
-    height: 28px;
-  }
-
-  .btn-voice,
   .btn-send,
   .btn-config {
     width: 28px;
