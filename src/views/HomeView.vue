@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <Sidebar :sidebar-visible="sidebarVisible" @toggle-sidebar="toggleSidebar" @new-chat="handleNewChat" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @toggle-sidebar="toggleSidebar" @new-chat="handleNewChat" />
 
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <div class="empty-state">
@@ -25,7 +25,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
-import Sidebar from '@/components/Sidebar.vue'
+import MenuSidebar from '@/components/MenuSidebar.vue'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
