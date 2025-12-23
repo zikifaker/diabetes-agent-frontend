@@ -1,31 +1,39 @@
 <template>
   <div class="chat-container">
-    <Sidebar :sidebar-visible="sidebarVisible" @toggle-sidebar="toggleSidebar" @new-chat="handleNewChat" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @toggle-sidebar="toggleSidebar" @new-chat="handleNewChat" />
 
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
-      <div class="chat-header">
-        <button @click="toggleSidebar" class="btn-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" :class="{ 'rotate-180': !sidebarVisible }">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-        </button>
-        <h4>{{ sessionStore.currentSession?.title || '新会话' }}</h4>
-      </div>
-
-      <div class="messages-scroll" ref="messagesContainer" @scroll="handleScroll">
-        <div class="messages-container">
-          <div v-if="sessionStore.messages.length === 0" class="empty-messages">
-            <p>开始体验 Diabetes Agent</p>
+      <div class="chat-wrapper">
+        <div class="chat-area">
+          <div class="chat-header">
+            <button @click="toggleSidebar" class="btn-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" :class="{ 'rotate-180': !sidebarVisible }">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </button>
+            <h4>{{ sessionStore.currentSession?.title || '新会话' }}</h4>
           </div>
 
-          <MessageBubble v-for="message in sessionStore.messages" :key="message.id" :message="message" />
+          <div class="messages-scroll" ref="messagesContainer" @scroll="handleScroll">
+            <div class="messages-container">
+              <div v-if="sessionStore.messages.length === 0" class="empty-messages">
+                <p>开始体验 Diabetes Agent</p>
+              </div>
 
-          <MessageBubble v-if="streamingMessage" :message="streamingMessage" :streaming="true" />
+              <MessageBubble v-for="message in sessionStore.messages" :key="message.id" :message="message"
+                @show-tool-calls="showToolCallSidebar" />
+
+              <MessageBubble v-if="streamingMessage" :message="streamingMessage" :streaming="true"
+                @show-tool-calls="showToolCallSidebar" />
+            </div>
+          </div>
+
+          <ChatInput @send="handleSend" @stop="handleStop" :loading="isLoading" />
         </div>
+        <ToolCallSidebar :visible="isToolCallSidebarVisible" :results="currentToolCallResults"
+          @close="closeToolCallSidebar" />
       </div>
-
-      <ChatInput @send="handleSend" @stop="handleStop" :loading="isLoading" />
     </main>
   </div>
 </template>
@@ -34,8 +42,9 @@
 import { ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
-import Sidebar from '@/components/Sidebar.vue'
+import MenuSidebar from '@/components/MenuSidebar.vue'
 import MessageBubble from '@/components/MessageBubble.vue'
+import ToolCallSidebar from '@/components/ToolCallSidebar.vue'
 import ChatInput from '@/components/chat-input/ChatInput.vue'
 
 const route = useRoute()
@@ -48,6 +57,8 @@ const streamingMessage = ref(null)
 const messagesContainer = ref(null)
 const autoScrollEnabled = ref(true)
 const abortController = ref(null)
+const isToolCallSidebarVisible = ref(false)
+const currentToolCallResults = ref([])
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
@@ -81,9 +92,10 @@ async function handleSend(data) {
     id: Date.now() + 1,
     created_at: new Date().toISOString(),
     role: 'ai',
-    immediate_steps: '',
-    content: '',
     thinking_complete: false,
+    immediate_steps: '',
+    tool_call_results: [],
+    content: ''
   }
 
   const token = localStorage.getItem('token')
@@ -178,6 +190,15 @@ function handleStreamEvent(event) {
       streamingMessage.value.immediate_steps += event.content
       break
 
+    case 'tool_call_results':
+      try {
+        const result = JSON.parse(event.content)
+        streamingMessage.value.tool_call_results.push(result)
+      } catch (e) {
+        console.error('Failed to parse tool_call_result:', event.content, e)
+      }
+      break
+
     case 'final_answer':
       if (!streamingMessage.value.thinking_complete && streamingMessage.value.immediate_steps) {
         streamingMessage.value.thinking_complete = true
@@ -231,6 +252,15 @@ function handleStop() {
   if (abortController.value) {
     abortController.value.abort()
   }
+}
+
+function showToolCallSidebar(results) {
+  currentToolCallResults.value = results
+  isToolCallSidebarVisible.value = true
+}
+
+function closeToolCallSidebar() {
+  isToolCallSidebarVisible.value = false
 }
 
 onMounted(async () => {
@@ -295,8 +325,23 @@ watch(() => route.params.id, async (newId) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  transition: var(--transition);
+  transition: margin-left 0.3s ease-in-out;
   background: var(--white);
+  overflow: hidden;
+}
+
+.chat-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease-in-out;
+  min-width: 0;
 }
 
 .main-content.sidebar-hidden {
@@ -308,7 +353,6 @@ watch(() => route.params.id, async (newId) => {
   align-items: center;
   gap: 16px;
   padding: 16px 24px;
-  border-bottom: 1px solid var(--border-color);
   background: var(--white);
 }
 
@@ -338,7 +382,7 @@ watch(() => route.params.id, async (newId) => {
   flex: 1;
   overflow-y: auto;
   padding: 24px 0;
-  scrollbar-width: thin;
+  scrollbar-color: rgba(84, 143, 206, 0.25) transparent;
 }
 
 .messages-scroll::-webkit-scrollbar {

@@ -52,6 +52,19 @@
         </transition>
       </div>
 
+      <div v-if="message.role === 'ai' && message.tool_call_results && message.tool_call_results.length > 0"
+        class="tool-call-trigger">
+        <button @click="showToolCalls" class="btn-tool-call">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
+            </path>
+          </svg>
+          <span>查看工具调用结果</span>
+        </button>
+      </div>
+
       <transition name="fade-in">
         <div v-if="message.content" class="message-content-wrapper">
           <div class="message-text markdown-body" v-html="renderMarkdown(message.content)"></div>
@@ -81,6 +94,8 @@ const props = defineProps({
 
 const authStore = useAuthStore()
 const showThinking = ref(true)
+
+const emit = defineEmits(['show-tool-calls'])
 
 marked.setOptions({
   gfm: true,
@@ -115,6 +130,10 @@ function toggleThinking() {
 
 function renderMarkdown(content) {
   return marked(content)
+}
+
+function showToolCalls() {
+  emit('show-tool-calls', props.message.tool_call_results)
 }
 </script>
 
@@ -178,16 +197,16 @@ function renderMarkdown(content) {
   line-height: 2.5;
 }
 
-.markdown-body > * {
+.markdown-body>* {
   margin-top: 0.55em;
   margin-bottom: 0.55em;
 }
 
-.markdown-body > *:first-child {
+.markdown-body>*:first-child {
   margin-top: 0;
 }
 
-.markdown-body > *:last-child {
+.markdown-body>*:last-child {
   margin-bottom: 0;
 }
 
@@ -201,9 +220,9 @@ function renderMarkdown(content) {
   margin-bottom: 0.4em;
 }
 
-.markdown-body h1 + p,
-.markdown-body h2 + p,
-.markdown-body h3 + p {
+.markdown-body h1+p,
+.markdown-body h2+p,
+.markdown-body h3+p {
   margin-top: 0.3em;
 }
 
@@ -217,7 +236,7 @@ function renderMarkdown(content) {
   margin: 0.25em 0;
 }
 
-.markdown-body li > p {
+.markdown-body li>p {
   margin: 0.25em 0;
 }
 
@@ -423,5 +442,38 @@ function renderMarkdown(content) {
 
 .fade-in-enter-active {
   animation: fadeIn 0.4s ease-out;
+}
+
+.tool-call-trigger {
+  margin-bottom: 12px;
+}
+
+.btn-tool-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-tool-call:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--primary-color);
+}
+
+.btn-tool-call svg {
+  transition: color 0.2s ease;
+}
+
+.btn-tool-call:hover svg {
+  color: var(--primary-color);
 }
 </style>
