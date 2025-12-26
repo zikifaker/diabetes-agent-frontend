@@ -3,13 +3,24 @@
     <div class="header">
       <h4 class="page-title">我的知识库</h4>
       <div class="header-actions">
-        <button class="action-btn search-btn" @click="showSearchModal = true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          搜索文件
-        </button>
+        <div class="search-expand" :class="{ active: searchActive }" @click.stop>
+          <input v-if="searchActive" v-model="searchQuery" class="search-input" placeholder="搜索文件"
+            @keyup.enter="handleSearch" />
+
+          <button class="search-trigger" @click="handleSearchClick">
+            <svg v-if="searchActive && searchQuery" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+
+            <span v-if="!searchActive">搜索文件</span>
+          </button>
+        </div>
 
         <div class="tooltip-container">
           <button class="action-btn upload-btn" @click="triggerFileUpload" :disabled="uploading">
@@ -122,6 +133,9 @@ const knowledgeBaseStore = useKnowledgeBaseStore()
 const { knowledgeFiles, loading, uploading } = storeToRefs(knowledgeBaseStore)
 
 const showSearchModal = ref(false)
+const searchActive = ref(false)
+const searchQuery = ref('')
+
 const fileInput = ref(null)
 const fileToDelete = ref(null)
 const showDeleteModal = ref(false)
@@ -132,6 +146,47 @@ const toast = ref({
   message: '',
   type: 'success'
 })
+
+async function handleSearch() {
+  if (!searchQuery.value.trim()) {
+    return
+  }
+
+  try {
+    await knowledgeBaseStore.searchFiles(searchQuery.value)
+  } catch (error) {
+    console.error('Failed to search files:', error)
+  }
+}
+
+function handleSearchClick() {
+  if (searchActive.value && searchQuery.value) {
+    clearSearch()
+    return
+  }
+
+  if (searchActive.value && !searchQuery.value) {
+    deactivateSearch()
+    return
+  }
+
+  activateSearch()
+}
+
+function clearSearch() {
+  searchQuery.value = ''
+  knowledgeBaseStore.fetchFiles()
+}
+
+function deactivateSearch() {
+  searchActive.value = false
+  searchQuery.value = ''
+  knowledgeBaseStore.fetchFiles()
+}
+
+function activateSearch() {
+  searchActive.value = true
+}
 
 function triggerFileUpload() {
   fileInput.value?.click()
@@ -211,7 +266,7 @@ async function handleDownload(fileName) {
 
   try {
     const downloadLink = await knowledgeBaseStore.fetchFileDownloadLink(fileName)
-    
+
     // 在新标签页打开链接
     const link = document.createElement('a')
     link.href = downloadLink
@@ -220,7 +275,7 @@ async function handleDownload(fileName) {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    
+
     showToast('文件下载成功', 'success')
   } catch (error) {
     console.error('Failed to download file:', error)
@@ -277,6 +332,10 @@ onMounted(async () => {
 
 function handleGlobalClick() {
   activeFileMenu.value = null
+  
+  if (searchActive.value && !searchQuery.value) {
+    searchActive.value = false
+  }
 }
 </script>
 
@@ -306,6 +365,71 @@ function handleGlobalClick() {
 .header-actions {
   display: flex;
   gap: 12px;
+}
+
+.search-expand {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+  transition: width 0.25s ease, border-color 0.25s ease;
+  width: 110px;
+}
+
+.search-expand.active {
+  width: 260px;
+  border-color: var(--primary-color);
+}
+
+.search-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 0 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  padding-right: 30px;
+}
+
+.clear-search {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search:hover {
+  color: var(--text-primary);
+}
+
+.search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.search-trigger:hover {
+  background: var(--hover-bg);
 }
 
 .action-btn {
@@ -416,17 +540,6 @@ function handleGlobalClick() {
   100% {
     transform: rotate(360deg);
   }
-}
-
-.empty-state h3 {
-  margin: 16px 0 8px 0;
-  font-size: 18px;
-  font-weight: 400;
-}
-
-.empty-state p {
-  margin: 0;
-  font-size: 14px;
 }
 
 .files-grid {
@@ -658,12 +771,6 @@ function handleGlobalClick() {
 
 .btn-delete-confirm:hover {
   background-color: #dc2626;
-}
-
-.search-btn:hover:not(:disabled) {
-  background: var(--primary-color);
-  color: var(--white);
-  border-color: var(--primary-color);
 }
 
 .toast {

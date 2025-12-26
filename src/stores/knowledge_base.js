@@ -97,8 +97,24 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
       const response = await api.get('/kb/download-link', {
         params: { 'file-name': fileName }
       })
-      
+
       return response.data.data.url
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function searchFiles(query) {
+    try {
+      const response = await api.get('/kb/metadata/search', {
+        params: { 'query': query }
+      })
+      const metadata = response.data.data.metadata || []
+      knowledgeFiles.value = metadata.map(item => ({
+        fileName: item.file_name,
+        fileType: item.file_type,
+        fileSize: item.file_size,
+      }))
     } catch (error) {
       throw error
     }
@@ -112,6 +128,7 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
     uploadFile,
     deleteFile,
     fetchFileDownloadLink,
+    searchFiles,
     validateFileType
   }
 })
