@@ -90,10 +90,6 @@
       </div>
     </div>
 
-    <div v-if="showSearchModal" class="modal-overlay" @click="showSearchModal = false">
-      <!-- TODO: 文件搜索 -->
-    </div>
-
     <Teleport to="body">
       <div v-if="showDeleteModal" class="modal-overlay" @click.self="cancelDelete">
         <div class="modal-content">
@@ -156,6 +152,10 @@ async function handleSearch() {
     await knowledgeBaseStore.searchFiles(searchQuery.value)
   } catch (error) {
     console.error('Failed to search files:', error)
+
+    knowledgeFiles.value = knowledgeFiles.value.filter(file =>
+      file.fileName.includes(searchQuery.value)
+    )
   }
 }
 
@@ -175,13 +175,13 @@ function handleSearchClick() {
 
 function clearSearch() {
   searchQuery.value = ''
-  knowledgeBaseStore.fetchFiles()
+  knowledgeBaseStore.resetFiles()
 }
 
 function deactivateSearch() {
   searchActive.value = false
   searchQuery.value = ''
-  knowledgeBaseStore.fetchFiles()
+  knowledgeBaseStore.resetFiles()
 }
 
 function activateSearch() {
@@ -324,7 +324,7 @@ onMounted(async () => {
   document.addEventListener('click', handleGlobalClick)
 
   try {
-    await knowledgeBaseStore.fetchFiles()
+    await knowledgeBaseStore.fetchFiles(true)
   } catch (error) {
     console.error('Failed to fetch knowledge metadata:', error)
   }

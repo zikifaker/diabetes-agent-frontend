@@ -4,19 +4,31 @@ import api from '@/services/api'
 
 export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
   const knowledgeFiles = ref([])
+  const cachedKnowledgeFiles = ref([])
   const loading = ref(false)
   const uploading = ref(false)
 
-  async function fetchFiles() {
+  async function fetchFiles(force = false) {
+    // 有缓存且不强制刷新，直接恢复
+    if (!force && cachedKnowledgeFiles.value.length > 0) {
+      knowledgeFiles.value = cachedKnowledgeFiles.value
+      return
+    }
+
     loading.value = true
+
     try {
       const response = await api.get('/kb/metadata')
       const metadata = response.data.data.metadata || []
-      knowledgeFiles.value = metadata.map(item => ({
+
+      const files = metadata.map(item => ({
         fileName: item.file_name,
         fileType: item.file_type,
         fileSize: item.file_size,
       }))
+
+      cachedKnowledgeFiles.value = files
+      knowledgeFiles.value = files
     } catch (error) {
       throw error
     } finally {
@@ -56,7 +68,7 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
         object_name: policyToken.dir + file.name
       })
 
-      await fetchFiles()
+      await fetchFiles(true)
 
       return { success: true, message: '文件上传成功' }
     } catch (error) {
@@ -66,26 +78,15 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
     }
   }
 
-  function validateFileType(file) {
-    const allowedTypes = [
-      'application/pdf',
-      'text/markdown',
-      'text/plain'
-    ]
-    const allowedExtensions = ['.pdf', '.md', '.txt']
-    const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
-    return allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)
-  }
-
   async function deleteFile(fileName) {
     try {
       await api.delete('/kb/metadata', {
         params: { 'file-name': fileName }
       })
-      const index = knowledgeFiles.value.findIndex(f => f.fileName === fileName)
-      if (index !== -1) {
-        knowledgeFiles.value.splice(index, 1)
-      }
+
+      cachedKnowledgeFiles.value = cachedKnowledgeFiles.value.filter(f => f.fileName !== fileName)
+      knowledgeFiles.value = knowledgeFiles.value.filter(f => f.fileName !== fileName)
+
       return { success: true, message: '文件删除成功' }
     } catch (error) {
       throw error
@@ -120,6 +121,21 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
     }
   }
 
+  function resetFiles() {
+    knowledgeFiles.value = cachedKnowledgeFiles.value
+  }
+
+  function validateFileType(file) {
+    const allowedTypes = [
+      'application/pdf',
+      'text/markdown',
+      'text/plain'
+    ]
+    const allowedExtensions = ['.pdf', '.md', '.txt']
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
+    return allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)
+  }
+
   return {
     knowledgeFiles,
     loading,
@@ -129,6 +145,7 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
     deleteFile,
     fetchFileDownloadLink,
     searchFiles,
+    resetFiles,
     validateFileType
   }
 })
