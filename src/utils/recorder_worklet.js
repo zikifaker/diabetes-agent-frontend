@@ -13,4 +13,5 @@ class RecorderProcessor extends AudioWorkletProcessor {
     return true;
   }
 }
+
 registerProcessor('recorder-processor', RecorderProcessor);

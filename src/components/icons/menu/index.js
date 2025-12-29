@@ -1,0 +1,5 @@
+export { default as NewChatIcon } from './NewChatIcon.vue'
+export { default as KnowledgeBaseIcon } from './KnowledgeBaseIcon.vue'
+export { default as ChatHistoryIcon } from './ChatHistoryIcon.vue'
+export { default as LogoutIcon } from './LogoutIcon.vue'
+export { default as SidebarToggleIcon } from './SidebarToggleIcon.vue'

@@ -3,11 +3,7 @@
     <button @click.stop="toggleDropdown" class="btn-llm" :class="{ 'active': showDropdown }"
       :aria-expanded="showDropdown" aria-haspopup="listbox" :aria-label="`Selected model: ${selectedLLM.name}`">
       {{ selectedLLM.name }}
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="dropdown-arrow"
-        :class="{ 'rotate-180': showDropdown }">
-        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" />
-      </svg>
+      <LLMSelectorToggleIcon :show-dropdown="showDropdown" />
     </button>
 
     <div v-if="showDropdown" class="llm-dropdown" role="listbox">
@@ -23,6 +19,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { LLMSelectorToggleIcon } from '@/components/icons'
 
 const props = defineProps({
   modelValue: {
@@ -120,14 +117,6 @@ watch(() => props.modelValue, (newVal) => {
   outline: none;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   border-color: var(--primary-color);
-}
-
-.dropdown-arrow {
-  transition: transform 0.2s ease;
-}
-
-.rotate-180 {
-  transform: rotate(180deg);
 }
 
 .llm-dropdown {

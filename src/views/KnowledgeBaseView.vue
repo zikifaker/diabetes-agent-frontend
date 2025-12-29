@@ -8,27 +8,15 @@
             @keyup.enter="handleSearch" />
 
           <button class="search-trigger" @click="handleSearchClick">
-            <svg v-if="searchActive && searchQuery" width="18" height="18" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
-              <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-
-            <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-
+            <CloseSearchIcon v-if="searchActive && searchQuery" @click.stop="clearSearch" />
+            <SearchIcon v-else />
             <span v-if="!searchActive">搜索文件</span>
           </button>
         </div>
 
         <div class="tooltip-container">
           <button class="action-btn upload-btn" @click="triggerFileUpload" :disabled="uploading">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
+            <UploadIcon />
             {{ uploading ? '上传中...' : '上传文件' }}
           </button>
           <div class="tooltip">支持单次上传不超过 10 个文件<br />单个文件不超过 100MB</div>
@@ -46,13 +34,7 @@
       </div>
 
       <div v-else-if="knowledgeFiles.length === 0" class="empty-state">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
-          opacity="0.3">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="12" y1="18" x2="12" y2="12"></line>
-          <line x1="9" y1="15" x2="15" y2="15"></line>
-        </svg>
+        <EmptyStateIcon />
         <p>暂无文件，请上传文件开始使用</p>
       </div>
 
@@ -60,11 +42,7 @@
         <div v-for="file in knowledgeFiles" :key="file.fileName" class="file-card">
           <div class="card-actions" :class="{ 'menu-open': activeFileMenu === file.fileName }">
             <button class="menu-trigger" @click.stop="toggleFileMenu(file.fileName)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="5" r="1.5" />
-                <circle cx="12" cy="12" r="1.5" />
-                <circle cx="12" cy="19" r="1.5" />
-              </svg>
+              <MenuIcon />
             </button>
             <div v-if="activeFileMenu === file.fileName" class="file-menu">
               <div class="menu-item" @click="handleDownload(file.fileName)">下载</div>
@@ -96,10 +74,7 @@
           <div class="modal-header">
             <h3>确认删除文件吗？</h3>
             <button @click="cancelDelete" class="close-button">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
+              <CloseIcon />
             </button>
           </div>
           <div class="modal-body">
@@ -124,6 +99,7 @@
 import { ref, onMounted } from 'vue'
 import { useKnowledgeBaseStore } from '@/stores/knowledge_base'
 import { storeToRefs } from 'pinia'
+import { SearchIcon, CloseSearchIcon, UploadIcon, EmptyStateIcon, MenuIcon, CloseIcon } from '@/components/icons'
 
 const knowledgeBaseStore = useKnowledgeBaseStore()
 const { knowledgeFiles, loading, uploading } = storeToRefs(knowledgeBaseStore)
@@ -332,7 +308,7 @@ onMounted(async () => {
 
 function handleGlobalClick() {
   activeFileMenu.value = null
-  
+
   if (searchActive.value && !searchQuery.value) {
     searchActive.value = false
   }

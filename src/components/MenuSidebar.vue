@@ -2,31 +2,17 @@
   <aside class="sidebar" :class="{ hidden: !sidebarVisible }">
     <div class="sidebar-header">
       <button @click="$emit('new-chat')" class="btn-new-chat">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
+        <NewChatIcon />
         <span class="btn-text">新对话</span>
       </button>
 
       <router-link to="/my-knowledge-base" class="btn-knowledge-base">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="menu-icon">
-          <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          <path
-            d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <KnowledgeBaseIcon />
         <span class="menu-text">我的知识库</span>
       </router-link>
 
       <div class="section-divider">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="menu-icon">
-          <path
-            d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
+        <ChatHistoryIcon />
         <span class="menu-text">会话历史</span>
       </div>
     </div>
@@ -44,11 +30,7 @@
 
         <div class="session-actions">
           <button class="btn-more" @click.stop="toggleSessionMenu(session.id)" aria-label="会话菜单">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="6" r="1.5" fill="currentColor" />
-              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-              <circle cx="12" cy="18" r="1.5" fill="currentColor" />
-            </svg>
+            <MenuIcon />
           </button>
 
           <div v-if="activeMenu === session.id" class="session-menu">
@@ -77,11 +59,7 @@
           </div>
           <div class="dropdown-divider"></div>
           <button @click="handleLogout" class="dropdown-item">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+            <LogoutIcon />
             退出登录
           </button>
         </div>
@@ -95,10 +73,7 @@
         <div class="modal-header">
           <h3>确认删除当前会话吗？</h3>
           <button @click="cancelDelete" class="close-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
+            <CloseIcon />
           </button>
         </div>
         <div class="modal-body">
@@ -118,6 +93,7 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSessionStore } from '@/stores/session'
+import { NewChatIcon, KnowledgeBaseIcon, ChatHistoryIcon, MenuIcon, LogoutIcon, CloseIcon } from '@/components/icons'
 
 defineProps({
   sidebarVisible: Boolean
@@ -626,10 +602,6 @@ onUnmounted(() => {
 
 .btn-delete-confirm:hover {
   background: #dc2626;
-}
-
-.menu-icon {
-  flex-shrink: 0;
 }
 
 .menu-text {

@@ -3,14 +3,7 @@
     <div class="message-avatar">
       <img v-if="message.role === 'human'" :src="userAvatar" alt="用户" />
       <div v-else class="assistant-avatar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
+        <AIAvatarIcon />
       </div>
     </div>
 
@@ -30,20 +23,14 @@
                 <span class="dot thinking"></span>
               </template>
               <template v-else>
-                <svg class="checkmark" viewBox="0 0 24 24" width="18" height="18">
-                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <ThinkingCheckmarkIcon />
               </template>
             </div>
             <span class="thinking-status">
               {{ getThinkingStatus() }}
             </span>
           </div>
-          <svg :class="{ 'expanded': showThinking }" class="toggle-icon" width="16" height="16" viewBox="0 0 24 24"
-            fill="none">
-            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
+          <ThinkingToggleIcon />
         </div>
         <transition name="slide-fade">
           <div v-if="showThinking" class="thinking-content">
@@ -55,12 +42,7 @@
       <div v-if="message.role === 'ai' && message.tool_call_results && message.tool_call_results.length > 0"
         class="tool-call-trigger">
         <button @click="showToolCalls" class="btn-tool-call">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
-            </path>
-          </svg>
+          <ToolCallResultIcon />
           <span>查看工具调用结果</span>
         </button>
       </div>
@@ -86,6 +68,7 @@
 import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { marked } from 'marked'
+import { AIAvatarIcon, ThinkingCheckmarkIcon, ThinkingToggleIcon, ToolCallResultIcon } from '@/components/icons'
 
 const props = defineProps({
   message: Object,
@@ -309,11 +292,6 @@ function showToolCalls() {
 
 .thinking-icon .dot.thinking:nth-child(2) {
   animation-delay: -0.16s;
-}
-
-.thinking-icon .checkmark {
-  color: var(--success-color, #10B981);
-  opacity: 0.9;
 }
 
 .thinking-content {

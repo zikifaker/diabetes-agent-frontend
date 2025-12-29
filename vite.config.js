@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import svgLoader from 'vite-svg-loader'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    svgLoader(svgLoaderConfig),
+  ],
   server: {
     port: 5173,
   },
@@ -13,3 +17,21 @@ export default defineConfig({
     }
   }
 })
+
+const svgLoaderConfig = {
+  defaultImport: 'component',
+  svgo: true,
+  svgoConfig: {
+    plugins: [
+      {
+        name: 'preset-default',
+        params: {
+          overrides: {
+            removeViewBox: false,
+            cleanupIDs: false,
+          },
+        },
+      },
+    ],
+  },
+}

@@ -9,14 +9,7 @@
       <button @click="toggleVoiceInput" class="btn-voice" :class="{ 'listening': isListening }"
         :aria-label="isListening ? '停止语音输入' : '开始语音输入'" :disabled="!isSupported">
         <span v-if="isListening" class="pulse-animation"></span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M12 1C10.34 1 9 2.34 9 4V12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12V4C15 2.34 13.66 1 12 1Z"
-            :fill="isListening ? '#ef4444' : 'currentColor'" :style="{ transition: 'fill 0.3s ease' }" />
-          <path
-            d="M17 11C17 14.31 14.31 17 11 17H13C13 17 13 17 13 17M7 11C7 14.31 9.69 17 13 17H11C11 17 11 17 11 17M12 17V21M8 21H16"
-            :stroke="isListening ? '#ef4444' : 'currentColor'" stroke-width="1.5" stroke-linecap="round"
-            :style="{ transition: 'stroke 0.3s ease' }" />
-        </svg>
+        <VoiceInputIcon :is-listening="isListening" />
         <span class="tooltip">{{ isListening ? '停止语音输入' : '语音输入' }}</span>
       </button>
     </div>
@@ -27,6 +20,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import api from '@/services/api'
 import workletURL from '@/utils/recorder_worklet.js?url'
+import { VoiceInputIcon } from '@/components/icons'
 
 const props = defineProps({
   lang: {

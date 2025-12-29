@@ -7,10 +7,7 @@
         <div class="chat-area">
           <div class="chat-header">
             <button @click="toggleSidebar" class="btn-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" :class="{ 'rotate-180': !sidebarVisible }">
-                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
+              <SidebarToggleIcon :rotated="!sidebarVisible" />
             </button>
             <h4>{{ sessionStore.currentSession?.title || '新会话' }}</h4>
           </div>
@@ -45,7 +42,8 @@ import { useSessionStore } from '@/stores/session'
 import MenuSidebar from '@/components/MenuSidebar.vue'
 import MessageBubble from '@/components/MessageBubble.vue'
 import ToolCallSidebar from '@/components/ToolCallSidebar.vue'
-import ChatInput from '@/components/chat-input/ChatInput.vue'
+import ChatInput from '@/components/ChatInput.vue'
+import { SidebarToggleIcon } from '@/components/icons'
 
 const route = useRoute()
 const router = useRouter()
@@ -414,9 +412,5 @@ watch(() => route.params.id, async (newId) => {
   height: 100%;
   color: var(--text-secondary);
   font-size: 16px;
-}
-
-.rotate-180 {
-  transform: rotate(180deg);
 }
 </style>

@@ -5,14 +5,7 @@
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <div class="empty-state">
         <div class="empty-state-icon">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
+          <MainIcon />
         </div>
         <h1>Diabetes Agent</h1>
         <p>糖尿病诊断智能体</p>
@@ -26,6 +19,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
 import MenuSidebar from '@/components/MenuSidebar.vue'
+import { MainIcon } from '@/components/icons'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
