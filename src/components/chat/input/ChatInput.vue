@@ -5,6 +5,8 @@
 
     <div class="input-area">
       <div class="input-pill">
+        <FileUploadPreview :files="uploadedFiles" @remove-file="removeFile" />
+
         <div class="input-content">
           <textarea ref="textareaRef" v-model="message" @keydown.enter.exact.prevent="handleSend"
             @keydown.shift.enter.stop @input="autoResize" :placeholder="placeholder" rows="1" class="message-input"
@@ -24,11 +26,14 @@
           </div>
 
           <div class="right-controls">
+            <FileUploadButton @file-upload="handleFileUpload" />
+
             <VoiceInputButton v-model:isListening="isListening" @result="handleVoiceResult" class="voice-input-btn" />
 
             <div class="tooltip-container">
-              <button v-if="!loading" @click="handleSend" class="btn-send" :disabled="!message.trim()"
-                :aria-label="message.trim() ? '发送消息' : '请输入消息内容'">
+              <button v-if="!loading" @click="handleSend" class="btn-send"
+                :disabled="!message.trim() && uploadedFiles.length === 0"
+                :aria-label="(message.trim() || uploadedFiles.length > 0) ? '发送消息' : '请输入消息内容'">
                 <SendIcon />
                 <span class="tooltip">发送消息</span>
               </button>
@@ -46,10 +51,14 @@
 
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
-import AgentConfigModal from '@/components/AgentConfigModal.vue'
-import LLMSelector from '@/components/LLMSelector.vue'
-import VoiceInputButton from '@/components/VoiceInputButton.vue'
+import { useRoute } from 'vue-router'
+import AgentConfigModal from '@/components/chat/input/AgentConfigModal.vue'
+import LLMSelector from '@/components/chat/input/LLMSelector.vue'
+import VoiceInputButton from '@/components/chat/input/VoiceInputButton.vue'
+import FileUploadButton from '@/components/chat/input/FileUploadButton.vue'
+import FileUploadPreview from '@/components/chat/input/FileUploadPreview.vue'
 import { AgentConfigIcon, SendIcon, StopIcon } from '@/components/icons'
+import { getUploadPolicyToken, uploadToOSS, NAMESPACE } from '@/utils/oss.js'
 
 const props = defineProps({
   loading: {
@@ -64,10 +73,13 @@ const props = defineProps({
 
 const emit = defineEmits(['send', 'stop'])
 
+const route = useRoute()
+
 const message = ref('')
 const showConfig = ref(false)
 const textareaRef = ref(null)
 const isListening = ref(false)
+const uploadedFiles = ref([])
 
 const llmOptions = ref([
   {
@@ -97,14 +109,17 @@ const toolsOptions = ref([
 
 const agentConfig = ref({
   maxIterations: 5,
-  tools: ['diabetes_knowledge_graph', 'user_knowledge_base']
+  tools: ['search_diabetes_knowledge_graph']
 })
 
 function handleSend() {
-  if (!message.value.trim() || props.loading) return
+  if ((!message.value.trim() && uploadedFiles.value.length === 0) || props.loading) return
 
   emit('send', {
     message: message.value,
+    uploaded_files: uploadedFiles.value.map(file => ({
+      fileName: file.file.name,
+    })),
     agentConfig: {
       ...agentConfig.value,
       model: selectedLLM.value.id
@@ -112,6 +127,8 @@ function handleSend() {
   })
 
   message.value = ''
+  uploadedFiles.value = []
+
   nextTick(() => {
     if (textareaRef.value) {
       textareaRef.value.style.height = 'auto'
@@ -140,6 +157,39 @@ function handleVoiceResult(results) {
     message.value = message.value ? `${message.value} ${transcript}` : transcript
     nextTick(() => autoResize())
   }
+}
+
+const handleFileUpload = async (files) => {
+  const newFiles = Array.from(files).map(file => ({
+    file,
+    uploading: true,
+    error: false,
+  }));
+  uploadedFiles.value = [...uploadedFiles.value, ...newFiles]
+
+  for (let i = 0; i < newFiles.length; i++) {
+    // 计算新文件在文件列表的下标，确保正确更新文件状态
+    const index = uploadedFiles.value.length - newFiles.length + i;
+    try {
+      const sessionId = route.params.id
+      const policyToken = await getUploadPolicyToken(newFiles[i].file.name, NAMESPACE.UPLOAD, sessionId)
+      
+      const response = await uploadToOSS(newFiles[i].file, policyToken)
+      if (response.ok) {
+        uploadedFiles.value[index].uploading = false;
+      } else {
+        throw new Error('Error uploading file')
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      uploadedFiles.value[index].uploading = false;
+      uploadedFiles.value[index].error = true;
+    }
+  }
+}
+
+const removeFile = (index) => {
+  uploadedFiles.value.splice(index, 1)
 }
 
 onMounted(() => {

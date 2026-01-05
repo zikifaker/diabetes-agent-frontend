@@ -13,6 +13,7 @@
         <span class="message-time">{{ formatTime(message.created_at) }}</span>
       </div>
 
+      <!--TODO:  用户上传的文件，点击即下载文件-->
       <div v-if="message.role === 'ai' && message.immediate_steps" class="thinking-steps">
         <div class="thinking-header" @click="toggleThinking">
           <div class="thinking-title">

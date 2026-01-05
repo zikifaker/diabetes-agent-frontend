@@ -18,7 +18,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
-import MenuSidebar from '@/components/MenuSidebar.vue'
+import MenuSidebar from '@/components/layout/MenuSidebar.vue'
 import { MainIcon } from '@/components/icons'
 
 const router = useRouter()
