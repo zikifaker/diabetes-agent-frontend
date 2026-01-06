@@ -249,17 +249,7 @@ async function handleDownload(fileName) {
 
   try {
     const downloadLink = await getFileDownloadLink(fileName, NAMESPACE.KNOWLEDGE_BASE)
-
-    // 在新标签页打开链接
-    const link = document.createElement('a')
-    link.href = downloadLink
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-    
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-
+    window.open(downloadLink, '_blank')
     showToast('文件下载成功', 'success')
   } catch (error) {
     console.error('Failed to download file:', error)

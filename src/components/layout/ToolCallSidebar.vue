@@ -16,7 +16,7 @@
         <div v-else class="tool-call-list">
           <div v-for="(result, index) in results" :key="index" class="tool-call-card">
             <div class="tool-call-title">
-              {{ result.name }}
+              Action {{ index + 1 }}: <br /> {{ result.name }}
             </div>
 
             <div class="tool-call-result">
@@ -156,19 +156,11 @@ const parseJSON = (value) => {
 }
 
 .tool-call-title {
-  text-align: center;
-  padding: 12px 16px;
+  padding: 12px 12px;
   font-weight: 500;
+  font-size: 14px;
   color: var(--text-primary);
   background: var(--background-color);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
   letter-spacing: 0.2px;
 }
 

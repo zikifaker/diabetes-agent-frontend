@@ -13,25 +13,24 @@
         <span class="message-time">{{ formatTime(message.created_at) }}</span>
       </div>
 
-      <div v-if="message.role === 'human' && message.uploaded_files && message.uploaded_files.length > 0"
-        class="uploaded-files">
-        <div v-for="(fileName, index) in message.uploaded_files" :key="index" class="file-message-card"
-          @click="handleFileClick(fileName)">
-          <div class="file-type-icon" :class="getFileCategory(fileName)">
-            <component :is="getFileIcon(fileName)" />
+      <div v-if="message.role === 'human' && message.uploaded_files?.length > 0" class="uploaded-files-grid">
+        <div v-for="(fileName, index) in message.uploaded_files" :key="index" class="file-card-modern"
+          :class="getFileCategory(fileName)" @click="handleFileClick(fileName)">
+          <div class="file-icon-wrapper">
+            <component :is="getFileIcon(fileName)" class="type-icon" />
           </div>
-          <div class="file-info">
-            <div class="file-name">{{ fileName }}</div>
+          <div class="file-details">
+            <span class="file-name-text">{{ fileName }}</span>
           </div>
         </div>
       </div>
 
       <div v-if="isFileParsing" class="file-parsing-animation">
         <div class="parsing-dots">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
           <div class="parsing-text">解析文件中</div>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
         </div>
       </div>
 
@@ -74,14 +73,6 @@
           <div class="message-text markdown-body" v-html="renderMarkdown(message.content)"></div>
         </div>
       </transition>
-
-      <div v-if="streaming && !message.content && message.immediate_steps" class="typing-wrapper">
-        <div class="typing-indicator">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -139,15 +130,7 @@ const handleFileClick = async (fileName) => {
   try {
     const sessionId = route.params.id
     const downloadLink = await getFileDownloadLink(fileName, NAMESPACE.UPLOAD, sessionId)
-
-    const link = document.createElement('a')
-    link.href = downloadLink
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    window.open(downloadLink, '_blank')
   } catch (error) {
     console.error('Failed to handle file click:', error)
   }
@@ -192,6 +175,15 @@ function showToolCalls() {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  width: 100%;
+}
+
+.message-wrapper.ai {
+  flex-direction: row;
+}
+
+.message-wrapper.human {
+  flex-direction: row-reverse;
 }
 
 .message-avatar {
@@ -217,15 +209,20 @@ function showToolCalls() {
 
 .message-content {
   flex: 1;
-  min-width: 800px;
-  max-width: 1000px;
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+}
+
+.human .message-content {
+  align-items: flex-end;
 }
 
 .message-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .message-sender {
@@ -245,6 +242,26 @@ function showToolCalls() {
   white-space: normal;
   word-break: break-word;
   line-height: 2.5;
+}
+
+.human .message-text {
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 16px 8px 16px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+  width: fit-content;
+  text-align: left;
+}
+
+.human .message-text :deep(*) {
+  color: white !important;
+}
+
+.ai .message-text {
+  background-color: transparent;
+  padding: 4px 0;
 }
 
 .markdown-body>* {
@@ -288,13 +305,6 @@ function showToolCalls() {
 
 .markdown-body li>p {
   margin: 0.25em 0;
-}
-
-.typing-indicator {
-  display: inline-block;
-  animation: blink 1s infinite;
-  color: var(--primary-color);
-  font-weight: bold;
 }
 
 .thinking-steps {
@@ -394,40 +404,16 @@ function showToolCalls() {
   animation: shine 3s infinite;
 }
 
-.typing-wrapper {
-  padding: 8px 0;
-}
-
-.typing-indicator {
-  display: flex;
-  gap: 6px;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  width: fit-content;
-}
-
-.typing-indicator .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--primary-color);
-  opacity: 0.6;
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-
-.typing-indicator .dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.typing-indicator .dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
 .message-content-wrapper {
   position: relative;
   padding: 8px 0;
   animation: fadeIn 0.3s ease-out;
+}
+
+.human .message-content-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 @keyframes bounce {
@@ -522,78 +508,91 @@ function showToolCalls() {
   color: var(--primary-color);
 }
 
-.uploaded-files {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+.uploaded-files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+  width: auto;
+  max-width: 100%;
 }
 
-.file-message-card {
+.human .uploaded-files-grid {
+  margin-left: auto;
+  justify-content: flex-end;
+  width: fit-content;
+}
+
+.file-card-modern {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 8px 12px;
-  background: var(--bg-secondary);
+  padding: 12px;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  max-width: 200px;
-  transition: all 0.2s ease;
-  position: relative;
+  border-radius: 12px;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-.file-message-card:hover {
-  background-color: var(--bg-tertiary);
-}
-
-.file-type-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+.file-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
   flex-shrink: 0;
-  margin-right: 8px;
+  transition: transform 0.3s ease;
 }
 
-.cat-image {
-  background: #eff6ff;
-  color: #3b82f6;
-}
-
-.cat-pdf {
-  background: #fef2f2;
-  color: #ef4444;
-}
-
-.cat-excel {
-  background: #f0fdf4;
-  color: #22c55e;
-}
-
-.cat-word {
-  background: #f5f3ff;
-  color: #8b5cf6;
-}
-
-.cat-default {
-  background: #f8fafc;
-  color: #64748b;
-}
-
-.file-info {
+.file-details {
   flex: 1;
   min-width: 0;
 }
 
-.file-name {
-  font-size: 13px;
+.file-name-text {
+  display: block;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.cat-image .file-icon-wrapper {
+  background: #e0f2fe;
+  color: #0ea5e9;
+}
+
+.cat-pdf .file-icon-wrapper {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.cat-excel .file-icon-wrapper {
+  background: #dcfce7;
+  color: #22c55e;
+}
+
+.cat-word .file-icon-wrapper {
+  background: #ede9fe;
+  color: #8b5cf6;
+}
+
+.cat-default .file-icon-wrapper {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.human .file-card-modern {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
 }
 
 .file-parsing-animation {
