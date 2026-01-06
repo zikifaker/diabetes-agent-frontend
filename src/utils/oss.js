@@ -1,15 +1,15 @@
 import api from '@/services/api'
 
 export const NAMESPACE = {
-  // 知识库文件的逻辑前缀
+  // 知识库文件前缀
   KNOWLEDGE_BASE: 'knowledge-base',
 
-  // 聊天文件的逻辑前缀
+  // 聊天文件前缀
   UPLOAD: 'upload'
 }
 
 // 获取文件上传凭证
-export async function getUploadPolicyToken(fileName, namespace = 'knowledge-base', sessionId = null) {
+export async function getUploadPolicyToken(fileName, namespace, sessionId = null) {
   const response = await api.get('/oss/policy-token', {
     params: {
       'file-name': fileName,
@@ -40,7 +40,7 @@ export async function uploadToOSS(file, policyToken) {
 }
 
 // 获取文件下载链接
-export async function getFileDownloadLink(fileName, namespace = 'knowledge-base', sessionId = null) {
+export async function getFileDownloadLink(fileName, namespace, sessionId = null) {
   const response = await api.get('/oss/download-link', {
     params: {
       'file-name': fileName,

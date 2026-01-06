@@ -80,6 +80,7 @@ const formatFileSize = (bytes) => {
 .file-item-wrapper {
   position: relative;
   width: 170px;
+  cursor: pointer;
 }
 
 .file-card {

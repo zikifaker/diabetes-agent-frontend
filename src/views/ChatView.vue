@@ -39,10 +39,10 @@
 import { ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
-import MenuSidebar from '@/components/MenuSidebar.vue'
-import MessageBubble from '@/components/MessageBubble.vue'
-import ToolCallSidebar from '@/components/ToolCallSidebar.vue'
-import ChatInput from '@/components/ChatInput.vue'
+import MenuSidebar from '@/components/layout/MenuSidebar.vue'
+import MessageBubble from '@/components/chat/message/MessageBubble.vue'
+import ToolCallSidebar from '@/components/layout/ToolCallSidebar.vue'
+import ChatInput from '@/components/chat/input/ChatInput.vue'
 import { SidebarToggleIcon } from '@/components/icons'
 
 const route = useRoute()
@@ -82,6 +82,7 @@ async function handleSend(data) {
     created_at: new Date().toISOString(),
     role: 'human',
     content: data.message,
+    uploaded_files: data.uploaded_files
   }
   sessionStore.addMessage(userMessage)
 
@@ -110,7 +111,8 @@ async function handleSend(data) {
         model: data.agentConfig.model,
         max_iterations: data.agentConfig.maxIterations,
         tools: data.agentConfig.tools
-      }
+      },
+      uploaded_files: data.uploaded_files
     })
 
     const response = await fetch('http://localhost:8088/api/chat', {

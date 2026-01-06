@@ -100,7 +100,7 @@ import { ref, onMounted } from 'vue'
 import { useKnowledgeBaseStore } from '@/stores/knowledge_base'
 import { storeToRefs } from 'pinia'
 import { SearchIcon, CloseIcon, UploadIcon, EmptyStateIcon, MenuIcon } from '@/components/icons'
-import { getFileDownloadLink } from '@/utils/oss'
+import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
 
 const knowledgeBaseStore = useKnowledgeBaseStore()
 const { knowledgeFiles, loading, uploading } = storeToRefs(knowledgeBaseStore)
@@ -248,13 +248,14 @@ async function handleDownload(fileName) {
   activeFileMenu.value = null
 
   try {
-    const downloadLink = await getFileDownloadLink(fileName)
+    const downloadLink = await getFileDownloadLink(fileName, NAMESPACE.KNOWLEDGE_BASE)
 
     // 在新标签页打开链接
     const link = document.createElement('a')
     link.href = downloadLink
     link.target = '_blank'
     link.rel = 'noopener noreferrer'
+    
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)

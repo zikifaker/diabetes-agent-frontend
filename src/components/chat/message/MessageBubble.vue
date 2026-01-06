@@ -13,7 +13,21 @@
         <span class="message-time">{{ formatTime(message.created_at) }}</span>
       </div>
 
-      <!--TODO:  用户上传的文件，点击即下载文件-->
+      <div v-if="message.uploaded_files && message.uploaded_files.length > 0" class="uploaded-files">
+        <div v-for="(fileName, index) in message.uploaded_files" :key="index" class="file-message-card"
+          @click="handleFileClick(fileName)">
+          <div class="tooltip">{{ fileName }}</div>
+
+          <div class="file-type-icon" :class="getFileCategory(fileName)">
+            <component :is="getFileIcon(fileName)" />
+          </div>
+
+          <div class="file-info">
+            <div class="file-name">{{ fileName }}</div>
+          </div>
+        </div>
+      </div>
+
       <div v-if="message.role === 'ai' && message.immediate_steps" class="thinking-steps">
         <div class="thinking-header" @click="toggleThinking">
           <div class="thinking-title">
@@ -67,16 +81,21 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { marked } from 'marked'
 import { AIAvatarIcon, ThinkingCheckmarkIcon, ThinkingToggleIcon, ToolCallResultIcon } from '@/components/icons'
+import { ImageIcon, DefaultFileIcon } from '@/components/icons'
+import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
 
 const props = defineProps({
   message: Object,
   streaming: Boolean
 })
 
+const route = useRoute()
 const authStore = useAuthStore()
+
 const showThinking = ref(true)
 
 const emit = defineEmits(['show-tool-calls'])
@@ -99,6 +118,38 @@ function formatTime(timestamp) {
   if (!timestamp) return ''
   const date = new Date(timestamp)
   return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+}
+
+const handleFileClick = async (fileName) => {
+  try{
+    const sessionId = route.params.id
+    const downloadLink = await getFileDownloadLink(fileName, NAMESPACE.UPLOAD, sessionId)
+    
+    const link = document.createElement('a')
+    link.href = downloadLink
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to handle file click:', error)
+  }
+}
+
+const getFileCategory = (fileName) => {
+  const ext = fileName.split('.').pop().toLowerCase()
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'cat-image'
+  if (['pdf'].includes(ext)) return 'cat-pdf'
+  if (['doc', 'docx', 'txt'].includes(ext)) return 'cat-word'
+  if (['xls', 'xlsx', 'csv'].includes(ext)) return 'cat-excel'
+  return 'cat-default'
+}
+
+const getFileIcon = (fileName) => {
+  const extension = fileName.split('.').pop().toLowerCase()
+  return extension.match(/(jpg|jpeg|png|gif|webp)$/) ? ImageIcon : DefaultFileIcon
 }
 
 function getThinkingStatus() {
@@ -454,5 +505,117 @@ function showToolCalls() {
 
 .btn-tool-call:hover svg {
   color: var(--primary-color);
+}
+
+.uploaded-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.file-message-card {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  max-width: 200px;
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip {
+  width: auto;
+  min-width: 60px;
+  background-color: var(--color-tooltip-bg, #333);
+  color: var(--color-tooltip-text, #fff);
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  opacity: 0;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-tooltip-bg, #333) transparent transparent transparent;
+  }
+}
+
+.file-message-card:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.file-message-card:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.file-type-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.cat-image {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.cat-pdf {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.cat-excel {
+  background: #f0fdf4;
+  color: #22c55e;
+}
+
+.cat-word {
+  background: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.cat-default {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
