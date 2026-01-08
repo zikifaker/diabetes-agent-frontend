@@ -53,8 +53,6 @@ export const useKnowledgeBaseStore = defineStore('knowledgeBase', () => {
         file_size: file.size,
         object_name: policyToken.key
       })
-
-      return { success: true, message: '文件上传成功' }
     } catch (error) {
       throw error
     } finally {

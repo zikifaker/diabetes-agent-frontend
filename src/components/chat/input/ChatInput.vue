@@ -83,7 +83,7 @@ const uploadedFiles = ref([])
 
 const llmOptions = ref([
   {
-    id: 'qwen3-plus',
+    id: 'qwen3-max',
     name: '通义千问3-max',
     description: '适配复杂场景，达到领域 SOTA 水平'
   },
@@ -162,28 +162,40 @@ const handleFileUpload = async (files) => {
     file,
     uploading: true,
     error: false,
-  }));
+  }))
+
+  const startIndex = uploadedFiles.value.length
   uploadedFiles.value = [...uploadedFiles.value, ...newFiles]
 
-  for (let i = 0; i < newFiles.length; i++) {
-    // 计算新文件在文件列表的下标，确保正确更新文件状态
-    const index = uploadedFiles.value.length - newFiles.length + i;
+  const uploadPromises = newFiles.map(async (file, i) => {
+    const index = startIndex + i
     try {
       const sessionId = route.params.id
-      const policyToken = await getUploadPolicyToken(newFiles[i].file.name, NAMESPACE.UPLOAD, sessionId)
-      
-      const response = await uploadToOSS(newFiles[i].file, policyToken)
-      if (response.ok) {
-        uploadedFiles.value[index].uploading = false;
-      } else {
+      const policyToken = await getUploadPolicyToken(
+        file.file.name,
+        NAMESPACE.UPLOAD,
+        sessionId
+      )
+
+      const response = await uploadToOSS(file.file, policyToken)
+      if (!response.ok) {
         throw new Error('Error uploading file')
       }
+      return { success: true, index }
     } catch (error) {
       console.error('Error uploading file:', error)
-      uploadedFiles.value[index].uploading = false;
-      uploadedFiles.value[index].error = true;
+      return { success: false, index }
     }
-  }
+  })
+
+  const results = await Promise.all(uploadPromises)
+  results.forEach(result => {
+    const index = result.index
+    uploadedFiles.value[index].uploading = false
+    if (!result.success) {
+      uploadedFiles.value[index].error = true
+    }
+  })
 }
 
 const removeFile = (index) => {

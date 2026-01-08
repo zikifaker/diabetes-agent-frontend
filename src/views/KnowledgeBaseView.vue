@@ -189,23 +189,31 @@ async function handleFileUpload(event) {
     return
   }
 
+  // 并行上传
   const uploadPromises = files.map(async (file) => {
     if (!knowledgeBaseStore.validateFileType(file)) {
-      showToast(`文件 ${file.name} 格式不支持，仅支持上传.pdf/.md/.txt格式的文件`, 'error')
-      return { success: false }
+      return {
+        success: false,
+        message: `文件 ${file.name} 格式不支持`
+      }
     }
 
     try {
-      return await knowledgeBaseStore.uploadFile(file)
+      await knowledgeBaseStore.uploadFile(file)
+      return { success: true }
     } catch (error) {
       console.error(`Failed to upload file ${file.name}:`, error)
-      return { success: false, message: `文件 ${file.name} 上传失败` }
+      return {
+        success: false,
+        message: `文件 ${file.name} 上传失败`
+      }
     }
   })
 
+  let successCount = 0
   try {
     const results = await Promise.all(uploadPromises)
-    const successCount = results.filter(r => r?.success).length
+    successCount = results.filter(r => r?.success).length
 
     if (successCount > 0) {
       showToast(`成功上传 ${successCount} 个文件`, 'success')
@@ -222,11 +230,13 @@ async function handleFileUpload(event) {
     event.target.value = ''
   }
 
-  // 上传成功后刷新文件列表
-  try {
-    await knowledgeBaseStore.fetchFiles(true)
-  } catch (error) {
-    console.error('Failed to fetch knowledge metadata:', error)
+  // 若存在文件上传成功，刷新文件列表
+  if (successCount > 0) {
+    try {
+      await knowledgeBaseStore.fetchFiles(true)
+    } catch (error) {
+      console.error('Failed to fetch knowledge metadata:', error)
+    }
   }
 }
 

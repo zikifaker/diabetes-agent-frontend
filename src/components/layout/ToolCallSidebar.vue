@@ -158,7 +158,7 @@ const parseJSON = (value) => {
 .tool-call-title {
   padding: 12px 12px;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-primary);
   background: var(--background-color);
   letter-spacing: 0.2px;
