@@ -14,10 +14,6 @@
 
           <div class="messages-scroll" ref="messagesContainer" @scroll="handleScroll">
             <div class="messages-container">
-              <div v-if="sessionStore.messages.length === 0" class="empty-messages">
-                <p>开始体验 Diabetes Agent</p>
-              </div>
-
               <MessageBubble v-for="message in sessionStore.messages" :key="message.id" :message="message"
                 @show-tool-calls="showToolCallSidebar" />
 
@@ -26,7 +22,7 @@
             </div>
           </div>
 
-          <ChatInput @send="handleSend" @stop="handleStop" :loading="isLoading" />
+          <ChatInput @send="onSend" @stop="chatStore.handleStop" :loading="isLoading" />
         </div>
         <ToolCallSidebar :visible="isToolCallSidebarVisible" :results="currentToolCallResults"
           @close="closeToolCallSidebar" />
@@ -38,7 +34,9 @@
 <script setup>
 import { ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/stores/session'
+import { useChat } from '@/stores/chat'
 import MenuSidebar from '@/components/layout/MenuSidebar.vue'
 import MessageBubble from '@/components/chat/message/MessageBubble.vue'
 import ToolCallSidebar from '@/components/layout/ToolCallSidebar.vue'
@@ -48,13 +46,17 @@ import { MenuSidebarToggleIcon } from '@/components/icons'
 const route = useRoute()
 const router = useRouter()
 const sessionStore = useSessionStore()
+const chatStore = useChat()
+
+const {
+  isLoading,
+  streamingMessage,
+  autoScrollEnabled,
+  messagesContainer,
+  messageFromHome
+} = storeToRefs(chatStore)
 
 const sidebarVisible = ref(true)
-const isLoading = ref(false)
-const streamingMessage = ref(null)
-const messagesContainer = ref(null)
-const autoScrollEnabled = ref(true)
-const abortController = ref(null)
 const isToolCallSidebarVisible = ref(false)
 const currentToolCallResults = ref([])
 
@@ -63,200 +65,32 @@ function toggleSidebar() {
 }
 
 async function handleNewChat() {
-  await sessionStore.createSession()
+  router.push(`/`)
 }
 
-async function handleSend(data) {
-  const sessionId = route.params.id
-  if (!sessionId) {
-    const session = await sessionStore.createSession()
-    router.push(`/chat/${session.id}`)
-    return
-  }
-
-  abortController.value = new AbortController()
-  isLoading.value = true
-
-  const userMessage = {
-    id: Date.now(),
-    created_at: new Date().toISOString(),
-    role: 'human',
-    content: data.message,
-    uploaded_files: data.uploaded_files
-  }
-  sessionStore.addMessage(userMessage)
-
-  streamingMessage.value = {
-    id: Date.now() + 1,
-    created_at: new Date().toISOString(),
-    role: 'ai',
-    thinking_complete: false,
-    immediate_steps: '',
-    tool_call_results: [],
-    content: '',
-    uploaded_files: data.uploaded_files
-  }
-
-  const token = localStorage.getItem('token')
-
+async function onSend(data) {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-
-    const body = JSON.stringify({
-      session_id: sessionId,
-      query: data.message,
-      agent_config: {
-        model: data.agentConfig.model,
-        max_iterations: data.agentConfig.maxIterations,
-        tools: data.agentConfig.tools
-      },
-      uploaded_files: data.uploaded_files
-    })
-
-    const response = await fetch('http://localhost:8088/api/chat', {
-      method: 'POST',
-      headers,
-      body,
-      signal: abortController.value.signal
-    })
-
-    const reader = response.body.getReader()
-    const decoder = new TextDecoder()
-    let buffer = ''
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      buffer += decoder.decode(value, { stream: true })
-
-      while (true) {
-        const newlineIndex = buffer.indexOf('\n\n')
-        if (newlineIndex === -1) break
-
-        const message = buffer.slice(0, newlineIndex)
-        buffer = buffer.slice(newlineIndex + 2)
-
-        const lines = message.split('\n');
-        let eventType = ''
-        let eventData = []
-
-        for (const line of lines) {
-          if (line.startsWith('event:')) {
-            eventType = line.slice(6).trim()
-          } else if (line.startsWith('data:')) {
-            eventData.push(line.slice(5))
-          }
-        }
-
-        const combinedData = eventData.join('\n')
-        if (combinedData || eventType === 'done') {
-          handleStreamEvent({
-            type: eventType,
-            content: combinedData,
-          })
-        }
-      }
-
-      await nextTick()
-      scrollToBottom()
-    }
+    await chatStore.handleSend(data, route.params.id)
   } catch (error) {
-    if (error.name === 'AbortError') {
-      console.log('Request was cancelled by user')
-
-      if (streamingMessage.value) {
-        streamingMessage.value.content += '\n\n[生成已停止]'
-        sessionStore.addMessage(streamingMessage.value)
-        streamingMessage.value = null
-      }
-    } else {
-      console.error('Error processing chat stream response:', error)
-    }
-  } finally {
-    isLoading.value = false
-    abortController.value = null
+    console.error('Error sending message:', error)
   }
-}
-
-function handleStreamEvent(event) {
-  if (!streamingMessage.value) return
-
-  switch (event.type) {
-    case 'immediate_steps':
-      streamingMessage.value.immediate_steps += event.content
-      break
-
-    case 'tool_call_results':
-      try {
-        const result = JSON.parse(event.content)
-        streamingMessage.value.tool_call_results.push(result)
-      } catch (e) {
-        console.error('Failed to parse tool_call_result:', event.content, e)
-      }
-      break
-
-    case 'final_answer':
-      if (!streamingMessage.value.thinking_complete && streamingMessage.value.immediate_steps) {
-        streamingMessage.value.thinking_complete = true
-      }
-      streamingMessage.value.content += event.content
-      break
-
-    case 'done':
-      if (!streamingMessage.value.thinking_complete && streamingMessage.value.immediate_steps) {
-        streamingMessage.value.thinking_complete = true
-      }
-      sessionStore.addMessage(streamingMessage.value)
-      streamingMessage.value = null
-      break
-
-    case 'error':
-      sessionStore.addMessage({
-        id: Date.now() + 1,
-        created_at: new Date().toISOString(),
-        role: 'ai',
-        content: "系统错误，请稍后重试",
-      })
-      console.error('Stream error:', event.content)
-      streamingMessage.value = null
-      break
-  }
-}
-
-function scrollToBottom() {
-  if (!autoScrollEnabled.value) return
-
-  const el = messagesContainer.value
-  if (!el) return
-
-  el.scrollTop = el.scrollHeight
 }
 
 function handleScroll() {
   const el = messagesContainer.value
   if (!el) return
 
-  // 用户不在底部时禁止自动滚动
-  autoScrollEnabled.value = isNearBottom(el)
+  // 用户距离容器底部超过 20px 时禁止自动滚动
+  autoScrollEnabled.value = isNearBottom(el, 20)
 }
 
-function isNearBottom(el, threshold = 20) {
+function isNearBottom(el, threshold) {
   return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold
-}
-
-function handleStop() {
-  if (abortController.value) {
-    abortController.value.abort()
-  }
 }
 
 function showToolCallSidebar(results) {
   // 若工具侧边栏处于打开状态，先关闭再切换到其他结果集，避免产生抖动
-  if(isToolCallSidebarVisible.value){
+  if (isToolCallSidebarVisible.value) {
     currentToolCallResults.value = null
     isToolCallSidebarVisible.value = false
     return
@@ -270,20 +104,31 @@ function closeToolCallSidebar() {
 }
 
 onMounted(async () => {
-  try {
-    const sessionId = route.params.id
-    if (sessionId) {
-      await sessionStore.fetchMessages(sessionId)
-      const session = sessionStore.sessions.find(s => s.id == sessionId)
-      if (session) {
-        sessionStore.setCurrentSession(session)
-      }
-      await nextTick()
-      scrollToBottom()
+  const sessionId = route.params.id
+  if (!sessionId) return
+
+  // 若从 HomeView 进入当前页面，发送消息
+  if (messageFromHome.value) {
+    const data = messageFromHome.value
+    messageFromHome.value = null
+
+    const session = sessionStore.sessions.find(s => s.id == sessionId)
+    if (session) {
+      sessionStore.setCurrentSession(session)
     }
-  } catch (error) {
-    console.error('Error fetching session messages:', error)
+
+    await chatStore.handleSend(data, sessionId)
+    return
   }
+
+  await sessionStore.fetchMessages(sessionId)
+  const session = sessionStore.sessions.find(s => s.id == sessionId)
+  if (session) {
+    sessionStore.setCurrentSession(session)
+  }
+
+  await nextTick()
+  chatStore.scrollToBottom()
 })
 
 onMounted(() => {
@@ -305,14 +150,16 @@ onMounted(() => {
 
 watch(() => route.params.id, async (newId) => {
   try {
-    if (newId) {
+    // 若当前不在发送消息且不是从首页跳转的新会话，获取历史消息
+    if (newId && !isLoading.value && !messageFromHome.value) {
       await sessionStore.fetchMessages(newId)
       const session = sessionStore.sessions.find(s => s.id == newId)
       if (session) {
         sessionStore.setCurrentSession(session)
       }
+
       await nextTick()
-      scrollToBottom()
+      chatStore.scrollToBottom()
     }
   } catch (error) {
     console.error('Error fetching session messages:', error)
@@ -340,6 +187,7 @@ watch(() => route.params.id, async (newId) => {
   display: flex;
   flex: 1;
   overflow: hidden;
+  padding-bottom: 24px;
 }
 
 .chat-area {
@@ -413,14 +261,5 @@ watch(() => route.params.id, async (newId) => {
 
 .messages-container::-webkit-scrollbar {
   display: none;
-}
-
-.empty-messages {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--text-secondary);
-  font-size: 16px;
 }
 </style>

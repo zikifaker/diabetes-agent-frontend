@@ -1,14 +1,20 @@
 <template>
   <div class="home-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" @toggle-sidebar="toggleSidebar" @new-chat="handleNewChat" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @toggle-sidebar="toggleSidebar" />
 
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
-      <div class="empty-state">
-        <div class="empty-state-icon">
-          <MainIcon />
+      <div class="hero-section">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <MainIcon />
+          </div>
+          <h1>Diabetes Agent</h1>
+          <p>糖尿病诊断智能体</p>
         </div>
-        <h1>Diabetes Agent</h1>
-        <p>糖尿病诊断智能体</p>
+      </div>
+
+      <div class="input-area-wrapper">
+        <ChatInput @send="onSend" @stop="chatStore.handleStop" :loading="isLoading" />
       </div>
     </main>
   </div>
@@ -17,21 +23,35 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useChat } from '@/stores/chat'
 import { useSessionStore } from '@/stores/session'
 import MenuSidebar from '@/components/layout/MenuSidebar.vue'
+import ChatInput from '@/components/chat/input/ChatInput.vue'
 import { MainIcon } from '@/components/icons'
 
-const router = useRouter()
+const chatStore = useChat()
 const sessionStore = useSessionStore()
+const router = useRouter()
+
+const { isLoading, messageFromHome } = storeToRefs(chatStore)
 const sidebarVisible = ref(true)
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
 }
 
-async function handleNewChat() {
-  const session = await sessionStore.createSession()
-  router.push(`/chat/${session.id}`)
+async function onSend(data) {
+  try {
+    const session = await sessionStore.createSession()
+    sessionStore.messages = [] 
+    sessionStore.setCurrentSession(session)
+    
+    messageFromHome.value = data
+    router.push(`/chat/${session.id}`)
+  } catch (error) {
+    console.error('Error sending message:', error)
+  }
 }
 </script>
 
@@ -40,25 +60,31 @@ async function handleNewChat() {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  background: var(--white);
 }
 
 .main-content {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-  background: var(--white);
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .main-content.sidebar-hidden {
   margin-left: 0;
 }
 
+.hero-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .empty-state {
   text-align: center;
   max-width: 600px;
-  padding: 40px;
 }
 
 .empty-state-icon {
@@ -96,5 +122,12 @@ async function handleNewChat() {
   background: var(--primary-hover);
   box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
   transform: translateY(-2px);
+}
+
+.input-area-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 24px;
 }
 </style>
