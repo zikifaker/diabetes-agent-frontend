@@ -34,7 +34,7 @@ const chatStore = useChat()
 const sessionStore = useSessionStore()
 const router = useRouter()
 
-const { isLoading, messageFromHome } = storeToRefs(chatStore)
+const { isLoading, initialMessage } = storeToRefs(chatStore)
 const sidebarVisible = ref(true)
 
 function toggleSidebar() {
@@ -44,10 +44,10 @@ function toggleSidebar() {
 async function onSend(data) {
   try {
     const session = await sessionStore.createSession()
-    sessionStore.messages = [] 
     sessionStore.setCurrentSession(session)
+    sessionStore.messages = []
     
-    messageFromHome.value = data
+    initialMessage.value = data
     router.push(`/chat/${session.id}`)
   } catch (error) {
     console.error('Error sending message:', error)

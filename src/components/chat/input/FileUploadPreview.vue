@@ -38,7 +38,10 @@
 import { DefaultFileIcon, ImageIcon, CloseIcon } from '@/components/icons'
 
 const props = defineProps({
-  files: { type: Array, required: true },
+  files: {
+    type: Array,
+    required: true
+  },
 })
 
 const emit = defineEmits(['remove-file'])

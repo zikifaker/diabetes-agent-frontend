@@ -10,7 +10,9 @@ export const useChat = defineStore('chat', () => {
   const abortController = ref(null)
   const autoScrollEnabled = ref(true)
   const messagesContainer = ref(null)
-  const messageFromHome = ref(null)
+
+  // 从首页跳转到聊天页面时发送的首条消息
+  const initialMessage = ref(null)
 
   async function handleSend(data, sessionId) {
     abortController.value = new AbortController()
@@ -170,7 +172,7 @@ export const useChat = defineStore('chat', () => {
     streamingMessage,
     autoScrollEnabled,
     messagesContainer,
-    messageFromHome,
+    initialMessage,
     handleSend,
     handleStop,
     scrollToBottom

@@ -53,7 +53,7 @@ const {
   streamingMessage,
   autoScrollEnabled,
   messagesContainer,
-  messageFromHome
+  initialMessage
 } = storeToRefs(chatStore)
 
 const sidebarVisible = ref(true)
@@ -107,10 +107,10 @@ onMounted(async () => {
   const sessionId = route.params.id
   if (!sessionId) return
 
-  // 若从 HomeView 进入当前页面，发送消息
-  if (messageFromHome.value) {
-    const data = messageFromHome.value
-    messageFromHome.value = null
+  if (initialMessage.value) {
+    // 若从首页跳转，发送消息
+    const data = initialMessage.value
+    initialMessage.value = null
 
     const session = sessionStore.sessions.find(s => s.id == sessionId)
     if (session) {
@@ -118,17 +118,18 @@ onMounted(async () => {
     }
 
     await chatStore.handleSend(data, sessionId)
-    return
-  }
+  } else {
+    // 若从已有的聊天会话进入，先获取历史消息
+    await sessionStore.fetchMessages(sessionId)
 
-  await sessionStore.fetchMessages(sessionId)
-  const session = sessionStore.sessions.find(s => s.id == sessionId)
-  if (session) {
-    sessionStore.setCurrentSession(session)
-  }
+    const session = sessionStore.sessions.find(s => s.id == sessionId)
+    if (session) {
+      sessionStore.setCurrentSession(session)
+    }
 
-  await nextTick()
-  chatStore.scrollToBottom()
+    await nextTick()
+    chatStore.scrollToBottom()
+  }
 })
 
 onMounted(() => {
@@ -150,9 +151,10 @@ onMounted(() => {
 
 watch(() => route.params.id, async (newId) => {
   try {
-    // 若当前不在发送消息且不是从首页跳转的新会话，获取历史消息
-    if (newId && !isLoading.value && !messageFromHome.value) {
+    // 若当前不在发送消息且不是从首页跳转，获取历史消息
+    if (newId && !isLoading.value && !initialMessage.value) {
       await sessionStore.fetchMessages(newId)
+
       const session = sessionStore.sessions.find(s => s.id == newId)
       if (session) {
         sessionStore.setCurrentSession(session)

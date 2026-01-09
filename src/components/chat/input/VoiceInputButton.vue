@@ -44,10 +44,6 @@ const isSupported = ref(true)
 const error = ref(null)
 
 let mediaRecorder = null
-let audioChunks = []
-let audioContext = null
-let workletNode = null
-let audioData = []
 let errorTimer = null
 
 const toggleVoiceInput = () => {
@@ -55,25 +51,30 @@ const toggleVoiceInput = () => {
 }
 
 const startListening = async () => {
+  let audioChunks = []
+  let audioContext = null
+  let workletNode = null
+  let audioData = []
+
   try {
     const sampleRate = 16000
-    const stream = await navigator.mediaDevices.getUserMedia({
+    const audioConstraints = {
       audio: {
-        sampleRate: sampleRate,
+        sampleRate,
         channelCount: 1,
         echoCancellation: true,
         noiseSuppression: true,
-      }
-    })
+      },
+    }
 
-    audioContext = new window.AudioContext({
-      sampleRate: sampleRate
-    })
+    const stream = await navigator.mediaDevices.getUserMedia(audioConstraints)
+    audioContext = new AudioContext({ sampleRate })
+
     await audioContext.audioWorklet.addModule(workletURL)
 
     const source = audioContext.createMediaStreamSource(stream)
     workletNode = new AudioWorkletNode(audioContext, 'recorder-processor')
-
+    
     workletNode.port.onmessage = (e) => {
       audioData.push(e.data.buffer)
     }
@@ -95,6 +96,7 @@ const startListening = async () => {
 
       const wavBlob = createWAVBlob(audioData, sampleRate)
       await fetchVoiceRecognitionAPI(wavBlob)
+      
       audioChunks = []
       audioData = []
     }

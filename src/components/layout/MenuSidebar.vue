@@ -205,7 +205,12 @@ function handleClickOutside(event) {
 }
 
 onMounted(async () => {
-  await sessionStore.fetchSessions()
+  try {
+    await sessionStore.fetchSessions()
+  } catch (error) {
+    console.error('Failed to fetch sessions:', error)
+  }
+
   document.addEventListener('click', handleClickOutside)
 })
 
