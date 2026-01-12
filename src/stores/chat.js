@@ -156,12 +156,15 @@ export const useChat = defineStore('chat', () => {
   }
 
   function scrollToBottom() {
-    if (!autoScrollEnabled.value) return
+    if (!autoScrollEnabled.value) return;
 
-    const el = messagesContainer.value
-    if (!el) return
+    const el = messagesContainer.value;
+    if (!el) return;
 
-    el.scrollTop = el.scrollHeight
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 
   function handleStop() {
