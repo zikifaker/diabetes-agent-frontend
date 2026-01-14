@@ -6,9 +6,14 @@
         <span class="btn-text">新对话</span>
       </button>
 
-      <router-link to="/my-knowledge-base" class="btn-knowledge-base">
+      <router-link to="/my-knowledge-base" class="menu-button">
         <KnowledgeBaseIcon />
         <span class="menu-text">我的知识库</span>
+      </router-link>
+
+      <router-link to="/blood-glucose" class="menu-button">
+        <BloodGlucoseIcon />
+        <span class="menu-text">血糖记录</span>
       </router-link>
 
       <div class="section-divider">
@@ -93,7 +98,7 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSessionStore } from '@/stores/session'
-import { NewChatIcon, KnowledgeBaseIcon, ChatHistoryIcon, MenuIcon, LogoutIcon, CloseIcon } from '@/components/icons'
+import { NewChatIcon, KnowledgeBaseIcon, ChatHistoryIcon, MenuIcon, LogoutIcon, CloseIcon, BloodGlucoseIcon } from '@/components/icons'
 
 defineProps({
   sidebarVisible: Boolean
@@ -270,8 +275,8 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.btn-knowledge-base {
-  margin-top: 12px;
+.menu-button {
+  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -282,8 +287,10 @@ onUnmounted(() => {
   color: inherit;
 }
 
-.btn-knowledge-base:hover {
-  background-color: var(--bg-hover);
+.menu-button:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+  font-weight: 500;
 }
 
 .sessions-list {

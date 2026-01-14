@@ -29,6 +29,12 @@ const routes = [
     name: 'KnowledgeBase',
     component: () => import('../views/KnowledgeBaseView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/blood-glucose',
+    name: 'BloodGlucose',
+    component: () => import('../views/BloodGlucoseAnalysisView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

@@ -1,3 +1,4 @@
+export { default as BloodGlucoseIcon } from './BloodGlucoseIcon.vue'
 export { default as NewChatIcon } from './NewChatIcon.vue'
 export { default as KnowledgeBaseIcon } from './KnowledgeBaseIcon.vue'
 export { default as ChatHistoryIcon } from './ChatHistoryIcon.vue'

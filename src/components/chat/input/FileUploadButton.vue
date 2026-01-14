@@ -24,10 +24,10 @@
     text/plain, .txt,
     text/markdown, .md
   " multiple>
-  </div>
 
-  <div v-if="toast.show" class="toast" :class="{ 'toast-error': toast.type === 'error' }">
-    {{ toast.message }}
+    <div v-if="toast.show" class="toast" :class="{ 'toast-error': toast.type === 'error' }">
+      {{ toast.message }}
+    </div>
   </div>
 </template>
 
