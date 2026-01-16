@@ -18,7 +18,7 @@
       </div>
     </header>
 
-    <AddRecordForm :show="showAddButton" @close="showAddButton = false" @save="handleSave" />
+    <AddRecordForm :show="showAddButton" @close="handleClose" @save="handleSave" />
 
     <TimeRangeSelector v-model:rangeType="rangeType" v-model:customRange="customDateRange" />
 
@@ -64,7 +64,7 @@ import TargetRateCard from '@/components/blood-glucose/TargetRateCard.vue'
 import DailyAverageChart from '@/components/blood-glucose/DailyAverageChart.vue'
 import DailyFluctuationChart from '@/components/blood-glucose/DailyFluctuationChart.vue'
 import { NewRecordIcon, ViewReportIcon, CalendarIcon } from '@/components/icons/blood-glucose'
-import { formatLocalDate } from '@/utils/time'
+import { formatLocalDate, formatLocalDateTime } from '@/utils/time'
 
 const bloodGlucoseStore = useBloodGlucoseStore()
 const { records } = storeToRefs(bloodGlucoseStore)
@@ -88,7 +88,7 @@ const toast = ref({
 
 const displayDateRange = computed(() => {
   const { start, end } = customDateRange.value
-  return `${formatDisplayDate(start)} ~ ${formatDisplayDate(end)}`
+  return `${formatLocalDateTime(start)} ~ ${formatLocalDateTime(end)}`
 })
 
 const filteredRecords = computed(() => {
@@ -101,6 +101,10 @@ const filteredRecords = computed(() => {
   })
 })
 
+const handleClose = () => {
+  showAddButton.value = false
+}
+
 const handleSave = async (record) => {
   try {
     await bloodGlucoseStore.addRecord(record)
@@ -111,6 +115,7 @@ const handleSave = async (record) => {
   }
 
   showToast('保存成功', 'success')
+  handleClose()
 
   try {
     await bloodGlucoseStore.fetchRecords(
@@ -131,17 +136,6 @@ function showToast(message, type = 'success') {
   setTimeout(() => {
     toast.value.show = false
   }, 1500)
-}
-
-const formatDisplayDate = (date) => {
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  }).replace(/\//g, '-')
 }
 
 watch(rangeType, (newType) => {

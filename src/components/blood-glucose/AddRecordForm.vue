@@ -43,6 +43,7 @@
 <script setup>
 import { ref } from 'vue';
 import { CloseIcon } from '@/components/icons';
+import { formatLocalDateTime } from '@/utils/time'
 
 const props = defineProps({
   show: {
@@ -55,8 +56,7 @@ const emit = defineEmits(['close', 'save'])
 
 const form = ref({
   value: 5.5,
-  // datetime-local 类型的格式为 YYYY-MM-DDTHH:mm，截取前 16 位
-  measuredAt: new Date().toISOString().slice(0, 16),
+  measuredAt: formatLocalDateTime(new Date()),
   diningStatus: 'fasting'
 })
 
@@ -85,7 +85,6 @@ const handleSubmit = () => {
     ...form.value,
     measuredAt: new Date(form.value.measuredAt).toISOString()
   })
-  close()
 }
 </script>
 
