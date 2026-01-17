@@ -26,7 +26,7 @@
           </div>
 
           <div class="right-controls">
-            <FileUploadButton @file-upload="handleFileUpload" :disabled="disableFileUploadButton"/>
+            <FileUploadButton @file-upload="handleFileUpload" :disabled="disableFileUploadButton" />
 
             <VoiceInputButton v-model:isListening="isListening" @result="handleVoiceResult" class="voice-input-btn" />
 
@@ -52,6 +52,7 @@
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { v4 as uuidv4 } from 'uuid'
 import AgentConfigModal from '@/components/chat/input/AgentConfigModal.vue'
 import LLMSelector from '@/components/chat/input/LLMSelector.vue'
 import VoiceInputButton from '@/components/chat/input/VoiceInputButton.vue'
@@ -163,6 +164,7 @@ function handleVoiceResult(results) {
 
 const handleFileUpload = async (files) => {
   const newFiles = Array.from(files).map(file => ({
+    id: uuidv4(),
     file,
     uploading: true,
     error: false,

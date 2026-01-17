@@ -1,6 +1,6 @@
 <template>
   <div v-if="files.length > 0" class="file-preview-shelf">
-    <div v-for="(file, index) in files" :key="index" class="file-item-wrapper">
+    <div v-for="(file, index) in files" :key="file.id" class="file-item-wrapper">
 
       <div class="tooltip">{{ file.file.name }}</div>
 
