@@ -38,9 +38,9 @@
             <MenuIcon />
           </button>
 
-          <div v-if="activeMenu === session.id" class="session-menu">
+          <div v-if="activeSessionMenu === session.id" class="session-menu">
             <button class="menu-item" @click.stop="startRename(session)">重命名</button>
-            <button class="menu-item delete" @click.stop="deleteSession(session.id)">删除</button>
+            <button class="menu-item delete" @click.stop="deleteSession(session)">删除</button>
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@ const authStore = useAuthStore()
 const sessionStore = useSessionStore()
 
 const showUserMenu = ref(false)
-const activeMenu = ref(null)
+const activeSessionMenu = ref(null)
 const showDeleteModal = ref(false)
 const sessionToDelete = ref(null)
 const editingSessionId = ref(null)
@@ -129,35 +129,35 @@ function selectSession(session) {
 }
 
 function toggleSessionMenu(id) {
-  activeMenu.value = activeMenu.value === id ? null : id
+  activeSessionMenu.value = activeSessionMenu.value === id ? null : id
 }
 
-function deleteSession(id) {
-  activeMenu.value = null
-  sessionToDelete.value = id
+function deleteSession(session) {
+  activeSessionMenu.value = null
+  sessionToDelete.value = session
   showDeleteModal.value = true
 }
 
 async function confirmDelete() {
-  if (sessionToDelete.value) {
-    await sessionStore.deleteSession(sessionToDelete.value)
-    if (route.params.id == sessionToDelete.value) {
+  if (sessionToDelete.value.id) {
+    await sessionStore.deleteSession(sessionToDelete.value.id)
+    if (route.params.id == sessionToDelete.value.id) {
       router.push('/')
     }
     showDeleteModal.value = false
     sessionToDelete.value = null
-    activeMenu.value = null
+    activeSessionMenu.value = null
   }
 }
 
 function cancelDelete() {
   showDeleteModal.value = false
   sessionToDelete.value = null
-  activeMenu.value = null
+  activeSessionMenu.value = null
 }
 
 function startRename(session) {
-  activeMenu.value = null
+  activeSessionMenu.value = null
   editingSessionId.value = session.id
   editingTitle.value = session.title
 
@@ -201,8 +201,8 @@ function handleClickOutside(event) {
     showUserMenu.value = false
   }
 
-  if (activeMenu.value && !event.target.closest('.session-actions')) {
-    activeMenu.value = null
+  if (activeSessionMenu.value && !event.target.closest('.session-actions')) {
+    activeSessionMenu.value = null
   }
 
   if (editingSessionId.value && !event.target.closest('.session-title-input')) {

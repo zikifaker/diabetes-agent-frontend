@@ -121,7 +121,7 @@ function handleSend() {
 
   emit('send', {
     message: message.value,
-    uploaded_files: uploadedFiles.value.map(f => f.file.name),
+    uploadedFiles: uploadedFiles.value.map(f => f.file.name),
     agentConfig: {
       ...agentConfig.value,
       model: selectedLLM.value.id

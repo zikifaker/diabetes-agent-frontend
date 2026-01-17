@@ -9,11 +9,11 @@
 
     <div class="message-content">
       <div class="message-header">
-        <span class="message-time">{{ formatTime(message.created_at) }}</span>
+        <span class="message-time">{{ formatLocalDateTime(message.createdAt) }}</span>
       </div>
 
-      <div v-if="message.role === 'human' && message.uploaded_files?.length > 0" class="uploaded-files-grid">
-        <div v-for="(fileName, index) in message.uploaded_files" :key="index" class="file-card-modern"
+      <div v-if="message.role === 'human' && message.uploadedFiles?.length > 0" class="uploaded-files-grid">
+        <div v-for="(fileName, index) in message.uploadedFiles" :key="index" class="file-card-modern"
           :class="getFileCategory(fileName)" @click="handleFileClick(fileName)">
           <div class="file-icon-wrapper">
             <component :is="getFileIcon(fileName)" class="type-icon" />
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <div v-if="message.role === 'ai' && message.intermediate_steps" class="thinking-steps">
+      <div v-if="message.role === 'ai' && message.intermediateSteps" class="thinking-steps">
         <div class="thinking-header" @click="toggleThinking">
           <div class="thinking-title">
             <div class="thinking-icon">
@@ -54,12 +54,12 @@
         </div>
         <transition name="slide-fade">
           <div v-if="showThinking" class="thinking-content">
-            <div class="thinking-text">{{ message.intermediate_steps }}</div>
+            <div class="thinking-text">{{ message.intermediateSteps }}</div>
           </div>
         </transition>
       </div>
 
-      <div v-if="message.role === 'ai' && message.tool_call_results && message.tool_call_results.length > 0"
+      <div v-if="message.role === 'ai' && message.toolCallResults && message.toolCallResults.length > 0"
         class="tool-call-trigger">
         <button @click="showToolCalls" class="btn-tool-call">
           <ToolCallResultIcon />
@@ -82,6 +82,7 @@ import { marked } from 'marked'
 import { AIAvatarIcon, ThinkingCheckmarkIcon, ThinkingToggleIcon, ToolCallResultIcon } from '@/components/icons'
 import { ImageIcon, DefaultFileIcon } from '@/components/icons'
 import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
+import { formatLocalDateTime } from '@/utils/time'
 
 const props = defineProps({
   message: Object,
@@ -108,20 +109,14 @@ const userAvatar = computed(() => authStore.user?.avatar || '')
 const isFileParsing = computed(() => {
   return (
     props.message.role === 'ai' &&
-    props.message.uploaded_files?.length > 0 &&
-    !props.message.thinking_complete
+    props.message.uploadedFiles?.length > 0 &&
+    !props.message.thinkingComplete
   )
 })
 
 const isThinking = computed(() => {
-  return props.streaming && !props.message.thinking_complete
+  return props.streaming && !props.message.thinkingComplete
 })
-
-function formatTime(timestamp) {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-}
 
 const handleFileClick = async (fileName) => {
   try {
@@ -148,7 +143,7 @@ const getFileIcon = (fileName) => {
 }
 
 function getThinkingStatus() {
-  if (props.streaming && !props.message.thinking_complete) {
+  if (props.streaming && !props.message.thinkingComplete) {
     return '思考中'
   }
   return '思考完毕'
@@ -163,7 +158,7 @@ function renderMarkdown(content) {
 }
 
 function showToolCalls() {
-  emit('show-tool-calls', props.message.tool_call_results)
+  emit('show-tool-calls', props.message.toolCallResults)
 }
 </script>
 

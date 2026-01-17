@@ -14,7 +14,7 @@
 
           <div class="messages-scroll" ref="messagesContainer" @scroll="handleScroll">
             <div class="messages-container">
-              <MessageBubble v-for="message in sessionStore.messages" :key="message.id" :message="message"
+              <MessageBubble v-for="message in sessionStore.messages" :key="message.createdAt" :message="message"
                 @show-tool-calls="showToolCallSidebar" />
 
               <MessageBubble v-if="streamingMessage" :message="streamingMessage" :streaming="isLoading"

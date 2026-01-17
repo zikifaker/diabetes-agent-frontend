@@ -1,5 +1,6 @@
 import { ref, nextTick } from 'vue'
 import { defineStore } from 'pinia'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useSessionStore } from '@/stores/session'
 
 export const useChat = defineStore('chat', () => {
@@ -10,104 +11,78 @@ export const useChat = defineStore('chat', () => {
   const abortController = ref(null)
   const autoScrollEnabled = ref(true)
   const messagesContainer = ref(null)
-
-  // 从首页跳转到聊天页面时发送的首条消息
   const initialMessage = ref(null)
 
   async function handleSend(data, sessionId) {
+    if (!data.message && !data.uploaded_files?.length) return
+
     abortController.value = new AbortController()
     isLoading.value = true
 
     const userMessage = {
-      id: Date.now(),
-      created_at: new Date().toISOString(),
+      createdAt: new Date(),
       role: 'human',
       content: data.message,
-      uploaded_files: data.uploaded_files
+      uploadedFiles: data.uploadedFiles || []
     }
     sessionStore.addMessage(userMessage)
 
     streamingMessage.value = {
-      id: Date.now() + 1,
-      created_at: new Date().toISOString(),
+      createdAt: new Date(),
       role: 'ai',
-      thinking_complete: false,
-      intermediate_steps: '',
-      tool_call_results: [],
+      thinkingComplete: false,
+      intermediateSteps: '',
+      toolCallResults: [],
       content: '',
-      uploaded_files: data.uploaded_files
+      // 对应的用户消息中的上传文件，用于渲染文件处理动画
+      uploadedFiles: data.uploadedFiles || []
     }
 
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:8088/api/chat', {
+      await fetchEventSource('http://localhost:8088/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
           session_id: sessionId,
           query: data.message,
           agent_config: {
-            model: data.agentConfig.model,
-            max_iterations: data.agentConfig.maxIterations,
-            tools: data.agentConfig.tools
+            model: data.agentConfig?.model,
+            max_iterations: data.agentConfig?.maxIterations,
+            tools: data.agentConfig?.tools
           },
-          uploaded_files: data.uploaded_files
+          uploaded_files: data.uploadedFiles
         }),
-        signal: abortController.value.signal
-      })
+        signal: abortController.value.signal,
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-        while (true) {
-          const newlineIndex = buffer.indexOf('\n\n')
-          if (newlineIndex === -1) break
-
-          const message = buffer.slice(0, newlineIndex)
-          buffer = buffer.slice(newlineIndex + 2)
-          const lines = message.split('\n')
-          let eventType = ''
-          let eventData = []
-
-          for (const line of lines) {
-            if (line.startsWith('event:')) {
-              eventType = line.slice(6).trim()
-            } else if (line.startsWith('data:')) {
-              eventData.push(line.slice(5))
-            }
-          }
-
+        onmessage(ev) {
           handleStreamEvent({
-            type: eventType,
-            content: eventData.join('\n')
+            type: ev.event,
+            content: ev.data
           })
 
-          await nextTick()
-          scrollToBottom()
+          nextTick(() => scrollToBottom())
+        },
+
+        onerror(err) {
+          if (err.name === 'AbortError') return
+          throw err
+        },
+
+        onclose() {
+          finishStreaming()
         }
-      }
+      })
     } catch (error) {
-      if (error.name === 'AbortError') {
-        if (streamingMessage.value) {
-          streamingMessage.value.thinking_complete = true
-          streamingMessage.value.content += '\n\n该消息被停止'
-          sessionStore.addMessage(streamingMessage.value)
-          streamingMessage.value = null
-        }
-      }
-      throw error
+      console.error('Chat Error:', error)
+      handleStreamEvent({
+        type: 'error',
+        content: error.message
+      })
     } finally {
       isLoading.value = false
-      abortController.value = null
     }
   }
 
@@ -116,60 +91,61 @@ export const useChat = defineStore('chat', () => {
 
     switch (event.type) {
       case 'intermediate_steps':
-        streamingMessage.value.intermediate_steps += event.content
+        streamingMessage.value.intermediateSteps += event.content
         break
 
       case 'tool_call_results':
         try {
           const result = JSON.parse(event.content)
-          streamingMessage.value.tool_call_results.push(result)
-        } catch (error) {
-          console.error(error)
+          streamingMessage.value.toolCallResults.push(result)
+        } catch (e) {
+          console.error('Tool Result Parse Error:', e)
         }
         break
 
       case 'final_answer':
-        if (!streamingMessage.value.thinking_complete && streamingMessage.value.intermediate_steps) {
-          streamingMessage.value.thinking_complete = true
+        if (!streamingMessage.value.thinkingComplete) {
+          streamingMessage.value.thinkingComplete = true
         }
         streamingMessage.value.content += event.content
         break
 
       case 'done':
-        if (!streamingMessage.value.thinking_complete && streamingMessage.value.intermediate_steps) {
-          streamingMessage.value.thinking_complete = true
-        }
-        sessionStore.addMessage(streamingMessage.value)
-        streamingMessage.value = null
+        finishStreaming()
         break
 
       case 'error':
-        sessionStore.addMessage({
-          id: Date.now() + 1,
-          created_at: new Date().toISOString(),
-          role: 'ai',
-          content: "系统错误，请稍后重试",
-        })
-        streamingMessage.value = null
+        streamingMessage.value.content = "系统错误，请稍后重试"
+        finishStreaming()
         break
     }
   }
 
+  function finishStreaming() {
+    if (streamingMessage.value) {
+      streamingMessage.value.thinkingComplete = true
+      sessionStore.addMessage({ ...streamingMessage.value })
+      streamingMessage.value = null
+    }
+    isLoading.value = false
+  }
+
   function scrollToBottom() {
-    if (!autoScrollEnabled.value) return;
-
-    const el = messagesContainer.value;
-    if (!el) return;
-
+    if (!autoScrollEnabled.value || !messagesContainer.value) return
+    const el = messagesContainer.value
     el.scrollTo({
       top: el.scrollHeight,
       behavior: 'smooth'
-    });
+    })
   }
 
   function handleStop() {
     if (abortController.value) {
       abortController.value.abort()
+      if (streamingMessage.value) {
+        streamingMessage.value.content += '\n\n[会话已由用户停止]'
+        finishStreaming()
+      }
     }
   }
 

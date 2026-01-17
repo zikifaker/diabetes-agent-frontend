@@ -45,15 +45,14 @@ export const useSessionStore = defineStore('session', () => {
   async function fetchMessages(sessionId) {
     const response = await api.get(`/session/${sessionId}/messages`)
     const messagesData = response.data.data.messages || []
-    messages.value = messagesData.map((msg, index) => ({
-      id: index,
-      created_at: msg.created_at,
+    messages.value = messagesData.map((msg) => ({
+      createdAt: new Date(msg.created_at),
       role: msg.role,
-      thinking_complete: true,
-      intermediate_steps: msg.intermediate_steps,
-      tool_call_results: msg.tool_call_results,
+      thinkingComplete: true,
+      intermediateSteps: msg.intermediate_steps,
+      toolCallResults: msg.tool_call_results,
       content: msg.content,
-      uploaded_files: msg.uploaded_files
+      uploadedFiles: msg.uploaded_files
     }))
   }
 
