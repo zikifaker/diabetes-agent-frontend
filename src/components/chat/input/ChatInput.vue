@@ -15,8 +15,6 @@
 
         <div class="input-controls">
           <div class="left-controls">
-            <LLMSelector v-model:modelValue="selectedLLM" :llm-options="llmOptions" class="llm-selector" />
-
             <div class="tooltip-container">
               <button @click="showConfig = true" class="btn-config" aria-label="智能体配置">
                 <AgentConfigIcon />
@@ -54,7 +52,6 @@ import { ref, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { v4 as uuidv4 } from 'uuid'
 import AgentConfigModal from '@/components/chat/input/AgentConfigModal.vue'
-import LLMSelector from '@/components/chat/input/LLMSelector.vue'
 import VoiceInputButton from '@/components/chat/input/VoiceInputButton.vue'
 import FileUploadButton from '@/components/chat/input/FileUploadButton.vue'
 import FileUploadPreview from '@/components/chat/input/FileUploadPreview.vue'
@@ -85,21 +82,6 @@ const showConfig = ref(false)
 const textareaRef = ref(null)
 const isListening = ref(false)
 const uploadedFiles = ref([])
-
-const llmOptions = ref([
-  {
-    id: 'qwen3-max',
-    name: '通义千问3-max',
-    description: '适配复杂场景，达到领域 SOTA 水平'
-  },
-  {
-    id: 'glm-4.7',
-    name: 'GLM-4.7',
-    description: '智谱 AI 最新旗舰模型'
-  }
-])
-
-const selectedLLM = ref(llmOptions.value[0])
 
 const toolsOptions = ref([
   {
@@ -319,7 +301,7 @@ onMounted(() => {
   justify-content: center;
   transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: var(--color-hover-bg);
     transform: translateY(-1px);
   }

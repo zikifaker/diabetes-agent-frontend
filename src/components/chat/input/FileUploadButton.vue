@@ -108,12 +108,9 @@ function showToast(message, type) {
   transition: color 0.2s ease-in-out;
 }
 
-.icon-button:hover {
-  color: var(--color-primary, #409eff);
-}
-
 .icon-button:hover:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--color-hover-bg);
+  transform: translateY(-1px);
 }
 
 .icon-button:disabled {

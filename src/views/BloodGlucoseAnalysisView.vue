@@ -253,6 +253,11 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
+.add-btn:hover,
+.report-btn:hover {
+  transform: translateY(-1px);
+}
+
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));

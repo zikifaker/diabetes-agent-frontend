@@ -2,16 +2,24 @@
   <div class="llm-selector">
     <button @click.stop="toggleDropdown" class="btn-llm" :class="{ 'active': showDropdown }"
       :aria-expanded="showDropdown" aria-haspopup="listbox" :aria-label="`Selected model: ${selectedLLM.name}`">
-      {{ selectedLLM.name }}
-      <LLMSelectorToggleIcon :show-dropdown="showDropdown" />
+      <div class="selected-model">
+        <div class="model-info">
+          <div class="model-name">{{ selectedLLM.name }}</div>
+        </div>
+      </div>
+      <LLMSelectorToggleIcon />
     </button>
 
     <div v-if="showDropdown" class="llm-dropdown" role="listbox">
       <div v-for="llm in llmOptions" :key="llm.id" @click="selectLLM(llm)" class="llm-option"
         :class="{ 'selected': llm.id === selectedLLM.id }" role="option" :aria-selected="llm.id === selectedLLM.id"
         tabindex="0" @keydown.enter="selectLLM(llm)" @keydown.space.prevent="selectLLM(llm)">
-        <div class="llm-name">{{ llm.name }}</div>
-        <div class="llm-desc">{{ llm.description }}</div>
+        <div class="option-content">
+          <div class="option-info">
+            <div class="option-name">{{ llm.name }}</div>
+            <div class="option-desc">{{ llm.description }}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -93,53 +101,70 @@ watch(() => props.modelValue, (newVal) => {
 .btn-llm {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--bg-color);
+  border-radius: 8px;
   color: var(--text-primary);
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 120px;
-  justify-content: space-between;
+  transition: background-color 0.2s ease;
+  min-width: 200px;
+  gap: 8px;
 }
 
-.btn-llm:hover,
+.btn-llm:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 .btn-llm.active {
-  background-color: var(--primary-color-10);
-  border-color: var(--primary-color-20);
-  color: var(--primary-color);
-}
-
-.btn-llm:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  background-color: rgba(0, 0, 0, 0.05);
   border-color: var(--primary-color);
 }
 
-.llm-dropdown {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  width: 280px;
-  max-height: 300px;
-  overflow-y: auto;
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  margin-bottom: 8px;
-  padding: 8px 0;
-  animation: fadeIn 0.15s ease-out;
+.selected-model {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
-@keyframes fadeIn {
+.model-info {
+  min-width: 0;
+}
+
+.model-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.llm-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  margin-top: 4px;
+  padding: 8px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(-8px);
   }
 
   to {
@@ -149,35 +174,55 @@ watch(() => props.modelValue, (newVal) => {
 }
 
 .llm-option {
-  padding: 10px 16px;
+  padding: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  border-radius: 4px;
-  margin: 2px 8px;
+  transition: background-color 0.15s ease;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  background-color: transparent;
+}
+
+.llm-option:last-child {
+  margin-bottom: 0;
 }
 
 .llm-option:hover,
 .llm-option:focus {
-  background-color: var(--bg-hover);
+  background-color: rgba(0, 0, 0, 0.05);
   outline: none;
+  transform: none;
+  border-color: transparent;
 }
 
 .llm-option.selected {
   background-color: var(--primary-color-10);
 }
 
-.llm-option.selected .llm-name {
+.llm-option.selected .option-name {
   color: var(--primary-color);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.llm-name {
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.option-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.option-name {
   font-weight: 500;
   color: var(--text-primary);
   margin-bottom: 2px;
+  font-size: 14px;
 }
 
-.llm-desc {
+.option-desc {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.4;

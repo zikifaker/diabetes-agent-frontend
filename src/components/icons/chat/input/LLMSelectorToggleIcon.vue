@@ -1,25 +1,25 @@
 <template>
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="dropdown-arrow"
-    :class="{ 'rotate-180': showDropdown }">
-    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-  </svg>
+  <div class="dropdown-arrows">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7 9L12 4L17 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        class="arrow-path up" />
+      <path d="M7 15L12 20L17 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round" class="arrow-path down" />
+    </svg>
+  </div>
 </template>
 
-<script setup>
-defineProps({
-  showDropdown: {
-    type: Boolean,
-    default: false
-  }
-})
-</script>
-
 <style scoped>
-.dropdown-arrow {
-  transition: transform 0.2s ease;
+.dropdown-arrows {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
-.dropdown-arrow.rotate-180 {
-  transform: rotate(180deg);
+.arrow-path {
+  transition: stroke-width 0.2s ease, opacity 0.2s ease;
 }
 </style>

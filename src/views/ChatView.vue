@@ -9,7 +9,7 @@
             <button @click="toggleSidebar" class="btn-icon">
               <MenuSidebarToggleIcon :rotated="!sidebarVisible" />
             </button>
-            <h4>{{ sessionStore.currentSession?.title || '新会话' }}</h4>
+            <LLMSelector v-model:modelValue="selectedLLM" :llm-options="llmOptions" class="llm-selector" />
           </div>
 
           <div class="messages-scroll" ref="messagesContainer" @scroll="handleScroll">
@@ -38,6 +38,7 @@ import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/stores/session'
 import { useChat } from '@/stores/chat'
 import MenuSidebar from '@/components/layout/MenuSidebar.vue'
+import LLMSelector from '@/components/chat/input/LLMSelector.vue'
 import MessageBubble from '@/components/chat/message/MessageBubble.vue'
 import ToolCallSidebar from '@/components/layout/ToolCallSidebar.vue'
 import ChatInput from '@/components/chat/input/ChatInput.vue'
@@ -59,6 +60,20 @@ const {
 const sidebarVisible = ref(true)
 const isToolCallSidebarVisible = ref(false)
 const currentToolCallResults = ref([])
+
+const llmOptions = ref([
+  {
+    id: 'qwen3-max',
+    name: '通义千问3-max',
+    description: '适配复杂场景，达到领域 SOTA 水平'
+  },
+  {
+    id: 'glm-4.7',
+    name: 'GLM-4.7',
+    description: '智谱 AI 最新旗舰模型'
+  }
+])
+const selectedLLM = ref(llmOptions.value[0])
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
@@ -214,12 +229,6 @@ watch(() => route.params.id, async (newId) => {
   gap: 16px;
   padding: 16px 24px;
   background: var(--white);
-}
-
-.chat-header h4 {
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--text-primary);
 }
 
 .btn-icon {
