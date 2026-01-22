@@ -44,14 +44,18 @@ const props = defineProps({
   }
 })
 
-const total = computed(() => props.records.length || 1)
+const total = computed(() => props.records.length)
+
 const highCount = computed(() => props.records.filter(r => r.value > props.high).length)
 const lowCount = computed(() => props.records.filter(r => r.value < props.low).length)
-const normalCount = computed(() => total.value - highCount.value - lowCount.value)
+const normalCount = computed(() => props.records.filter(r => r.value >= props.low && r.value <= props.high).length)
 
-const normalRate = computed(() => Math.round(normalCount.value / total.value * 100))
-const highRate = computed(() => Math.round(highCount.value / total.value * 100))
-const lowRate = computed(() => Math.round(lowCount.value / total.value * 100))
+const normalRate = computed(() =>
+  total.value === 0 ? 0 : Math.round(normalCount.value / total.value * 100))
+const highRate = computed(() =>
+  total.value === 0 ? 0 : Math.round(highCount.value / total.value * 100))
+const lowRate = computed(() =>
+  total.value === 0 ? 0 : Math.round(lowCount.value / total.value * 100))
 </script>
 
 <style scoped>
