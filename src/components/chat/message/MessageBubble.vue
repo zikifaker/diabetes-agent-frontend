@@ -557,7 +557,7 @@ function showToolCalls() {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin: 12px 0;
+  margin: 8px 0;
 }
 
 .status-capsule {

@@ -105,12 +105,16 @@ const toolsOptions = ref([
   {
     label: "血糖记录查询",
     value: 'get_blood_glucose_records'
+  },
+  {
+    label: "健康档案查询",
+    value: 'get_health_profile'
   }
 ])
 
 const agentConfig = ref({
   maxIterations: 5,
-  tools: ['search_diabetes_knowledge_graph', 'get_blood_glucose_records']
+  tools: ['search_diabetes_knowledge_graph', 'get_blood_glucose_records', 'get_health_profile']
 })
 
 function handleSend() {

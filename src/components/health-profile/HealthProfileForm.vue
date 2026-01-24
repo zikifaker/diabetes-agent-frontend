@@ -4,9 +4,8 @@
       <div class="profile-card">
         <header class="profile-header">
           <div class="title-group">
-            <div class="badge">医疗档案</div>
             <h1>我的健康档案</h1>
-            <p>完善信息，获取更精准的糖尿病饮食与运动建议</p>
+            <p>完善信息，获取更精准的糖尿病治疗建议</p>
           </div>
           <div class="header-actions">
             <button v-if="!isEditing" @click="isEditing = true" class="btn-edit-outline">
@@ -197,17 +196,6 @@ onMounted(async () => {
   margin-bottom: 20px;
 }
 
-.badge {
-  display: inline-block;
-  padding: 2px 10px;
-  background: rgba(66, 133, 244, 0.1);
-  color: #4285F4;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
 .title-group h1 {
   font-size: 20px;
   font-weight: 700;
@@ -276,7 +264,7 @@ onMounted(async () => {
 }
 
 .form-section {
-  margin-bottom: 0;
+  padding: 10px 0;
 }
 
 .form-section label {
@@ -324,13 +312,14 @@ onMounted(async () => {
 textarea.modern-input,
 .read-only-value.multiline {
   min-height: 60px;
+  max-height: 300px;
   align-items: flex-start;
+  resize: vertical;
 }
 
 .form-actions-wrapper {
   min-height: 60px;
   margin-top: 12px;
-  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: flex-end;

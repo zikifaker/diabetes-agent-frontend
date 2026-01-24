@@ -262,9 +262,20 @@ watch(() => props.show, (isShowing) => {
   border: none;
 }
 
+.btn.primary:hover {
+  background: var(--primary-hover, #1557b0);
+  border-color: var(--primary-hover, #1557b0);
+  box-shadow: 0 1px 2px 0 rgba(66, 133, 244, 0.3);
+}
+
 .btn.ghost {
   background: transparent;
   border: 1px solid #d1d5db;
   color: #374151;
+}
+
+.btn.ghost:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #dadce0;
 }
 </style>
