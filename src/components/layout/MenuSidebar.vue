@@ -16,6 +16,11 @@
         <span class="menu-text">血糖记录</span>
       </router-link>
 
+      <button @click="$emit('show-health-profile')" class="menu-button">
+        <HealthProfileIcon />
+        <span class="menu-text">健康档案</span>
+      </button>
+
       <div class="section-divider">
         <ChatHistoryIcon />
         <span class="menu-text">会话历史</span>
@@ -98,13 +103,22 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSessionStore } from '@/stores/session'
-import { NewChatIcon, KnowledgeBaseIcon, ChatHistoryIcon, MenuIcon, LogoutIcon, CloseIcon, BloodGlucoseIcon } from '@/components/icons'
+import {
+  NewChatIcon,
+  KnowledgeBaseIcon,
+  BloodGlucoseIcon,
+  HealthProfileIcon,
+  ChatHistoryIcon,
+  MenuIcon,
+  LogoutIcon,
+  CloseIcon,
+} from '@/components/icons'
 
 defineProps({
   sidebarVisible: Boolean
 })
 
-defineEmits(['toggle-sidebar', 'new-chat'])
+defineEmits(['new-chat', 'show-health-profile'])
 
 const route = useRoute()
 const router = useRouter()
@@ -292,6 +306,16 @@ onUnmounted(() => {
   background-color: rgba(59, 130, 246, 0.1);
   color: var(--primary-color);
   font-weight: 500;
+}
+
+button.menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .sessions-list {

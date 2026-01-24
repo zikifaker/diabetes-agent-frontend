@@ -690,7 +690,7 @@ onUnmounted(() => {
 
 .close-button:hover {
   color: var(--text-primary);
-  background-color: var(--bg-hover);
+  background-color: var(--hover-bg);
 }
 
 .modal-body {
@@ -725,7 +725,7 @@ onUnmounted(() => {
 }
 
 .btn-cancel:hover {
-  background-color: var(--bg-hover);
+  background-color: var(--hover-bg);
 }
 
 .btn-delete-confirm {

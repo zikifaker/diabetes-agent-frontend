@@ -37,5 +37,5 @@ export const useBloodGlucoseStore = defineStore('bloodGlucose', () => {
     records,
     fetchRecords,
     addRecord
-  };
-});
+  }
+})
