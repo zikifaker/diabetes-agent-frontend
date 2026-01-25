@@ -51,7 +51,7 @@
 import { ref } from 'vue'
 import JsonViewer from 'vue-json-viewer'
 import 'vue-json-viewer/style.css'
-import { CloseIcon } from '@/icons'
+import { CloseIcon } from '@/icons/common'
 
 defineProps({
   visible: {

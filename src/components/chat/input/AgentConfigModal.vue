@@ -178,7 +178,6 @@ watch(() => props.show, (isShowing) => {
 }
 
 .tools-list {
-  border: 1px solid #e5e7eb;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -188,11 +187,6 @@ watch(() => props.show, (isShowing) => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.tool-row:last-child {
-  border-bottom: none;
 }
 
 .tool-name {
@@ -242,7 +236,6 @@ watch(() => props.show, (isShowing) => {
 
 .modal-footer {
   padding: 14px 20px;
-  border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
   gap: 10px;

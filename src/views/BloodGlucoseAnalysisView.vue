@@ -58,11 +58,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useBloodGlucoseStore } from '@/stores/blood_glucose'
-import TimeRangeSelector from '@/components/blood-glucose/TimeRangeSelector.vue'
-import AddRecordForm from '@/components/blood-glucose/AddRecordForm.vue'
-import TargetRateCard from '@/components/blood-glucose/TargetRateCard.vue'
-import DailyAverageChart from '@/components/blood-glucose/DailyAverageChart.vue'
-import DailyFluctuationChart from '@/components/blood-glucose/DailyFluctuationChart.vue'
+import { TimeRangeSelector, AddRecordForm, TargetRateCard, DailyAverageChart, DailyFluctuationChart } from '@/components/blood-glucose'
 import { NewRecordIcon, ViewReportIcon, CalendarIcon } from '@/icons/blood-glucose'
 import { formatLocalDate, formatLocalDateTime } from '@/utils/time'
 

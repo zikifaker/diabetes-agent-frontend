@@ -60,10 +60,7 @@
 import { ref, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { v4 as uuidv4 } from 'uuid'
-import AgentConfigModal from '@/components/chat/input/AgentConfigModal.vue'
-import VoiceInputButton from '@/components/chat/input/VoiceInputButton.vue'
-import FileUploadButton from '@/components/chat/input/FileUploadButton.vue'
-import FileUploadPreview from '@/components/chat/input/FileUploadPreview.vue'
+import { AgentConfigModal, VoiceInputButton, FileUploadButton, FileUploadPreview } from '@/components/chat/input'
 import { AgentConfigIcon, SendIcon, StopIcon, KnowledgeBaseRetrievalIcon } from '@/icons/chat/input'
 import { getUploadPolicyToken, uploadToOSS, NAMESPACE } from '@/utils/oss.js'
 
