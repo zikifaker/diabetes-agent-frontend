@@ -54,12 +54,13 @@ import { storeToRefs } from 'pinia'
 import { useChat } from '@/stores/chat'
 import { useSessionStore } from '@/stores/session'
 import { useLLMOptionsStore } from '@/stores/llm_options'
-import { useHealthProfileStore } from '@/stores/health_profile';
+import { useHealthProfileStore } from '@/stores/health_profile'
 import MenuSidebar from '@/components/layout/MenuSidebar.vue'
 import HealthProfileForm from '@/components/health-profile/HealthProfileForm.vue'
 import ChatInput from '@/components/chat/input/ChatInput.vue'
 import LLMSelector from '@/components/chat/input/LLMSelector.vue'
-import { MainIcon, ArrowIcon, MenuSidebarToggleIcon } from '@/components/icons'
+import { MainIcon, ArrowIcon } from '@/icons/common'
+import { MenuSidebarToggleIcon } from '@/icons/navigation'
 
 const chatStore = useChat()
 const sessionStore = useSessionStore()

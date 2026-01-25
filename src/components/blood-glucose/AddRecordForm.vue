@@ -41,8 +41,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { CloseIcon } from '@/components/icons';
+import { ref } from 'vue'
+import { CloseIcon } from '@/icons/common'
 import { formatLocalDateTime } from '@/utils/time'
 
 const props = defineProps({

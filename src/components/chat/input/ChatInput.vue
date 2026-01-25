@@ -64,7 +64,7 @@ import AgentConfigModal from '@/components/chat/input/AgentConfigModal.vue'
 import VoiceInputButton from '@/components/chat/input/VoiceInputButton.vue'
 import FileUploadButton from '@/components/chat/input/FileUploadButton.vue'
 import FileUploadPreview from '@/components/chat/input/FileUploadPreview.vue'
-import { AgentConfigIcon, SendIcon, StopIcon, KnowledgeBaseRetrievalIcon } from '@/components/icons'
+import { AgentConfigIcon, SendIcon, StopIcon, KnowledgeBaseRetrievalIcon } from '@/icons/chat/input'
 import { getUploadPolicyToken, uploadToOSS, NAMESPACE } from '@/utils/oss.js'
 
 const props = defineProps({

@@ -34,11 +34,11 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  low: {
+  lowThreshold: {
     type: Number,
     required: true
   },
-  high: {
+  highThreshold: {
     type: Number,
     required: true
   }
@@ -46,9 +46,26 @@ const props = defineProps({
 
 const total = computed(() => props.records.length)
 
-const highCount = computed(() => props.records.filter(r => r.value > props.high).length)
-const lowCount = computed(() => props.records.filter(r => r.value < props.low).length)
-const normalCount = computed(() => props.records.filter(r => r.value >= props.low && r.value <= props.high).length)
+const counts = computed(() => {
+  let high = 0, low = 0, normal = 0
+  const { lowThreshold, highThreshold, records } = props
+
+  records.forEach(record => {
+    if (record.value > highThreshold) {
+      high++
+    } else if (record.value < lowThreshold) {
+      low++
+    } else {
+      normal++
+    }
+  })
+
+  return { high, low, normal }
+})
+
+const highCount = computed(() => counts.value.high)
+const lowCount = computed(() => counts.value.low)
+const normalCount = computed(() => counts.value.normal)
 
 const normalRate = computed(() =>
   total.value === 0 ? 0 : Math.round(normalCount.value / total.value * 100))

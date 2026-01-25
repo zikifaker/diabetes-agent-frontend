@@ -101,7 +101,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useKnowledgeBaseStore } from '@/stores/knowledge_base'
 import { storeToRefs } from 'pinia'
-import { SearchIcon, CloseIcon, UploadIcon, EmptyStateIcon, MenuIcon } from '@/components/icons'
+import { SearchIcon, UploadIcon, EmptyStateIcon } from '@/icons/knowledge-base'
+import { CloseIcon, MenuIcon } from '@/icons/common'
 import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
 
 const knowledgeBaseStore = useKnowledgeBaseStore()

@@ -104,15 +104,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSessionStore } from '@/stores/session'
 import {
-  NewChatIcon,
-  KnowledgeBaseIcon,
-  BloodGlucoseIcon,
-  HealthProfileIcon,
-  ChatHistoryIcon,
-  MenuIcon,
-  LogoutIcon,
-  CloseIcon,
-} from '@/components/icons'
+  NewChatIcon, KnowledgeBaseIcon, BloodGlucoseIcon,
+  HealthProfileIcon, ChatHistoryIcon, LogoutIcon
+} from '@/icons/navigation'
+import { MenuIcon, CloseIcon } from '@/icons/common'
 
 defineProps({
   sidebarVisible: Boolean

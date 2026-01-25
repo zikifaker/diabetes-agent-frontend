@@ -22,7 +22,7 @@
 
     <TimeRangeSelector v-model:rangeType="rangeType" v-model:customRange="customDateRange" />
 
-    <TargetRateCard :records="filteredRecords" :low="lowBloodGlucose" :high="highBloodGlucose" />
+    <TargetRateCard :records="filteredRecords" :lowThreshold="lowBloodGlucose" :highThreshold="highBloodGlucose" />
 
     <div class="chart-grid">
       <section class="chart-card">
@@ -63,7 +63,7 @@ import AddRecordForm from '@/components/blood-glucose/AddRecordForm.vue'
 import TargetRateCard from '@/components/blood-glucose/TargetRateCard.vue'
 import DailyAverageChart from '@/components/blood-glucose/DailyAverageChart.vue'
 import DailyFluctuationChart from '@/components/blood-glucose/DailyFluctuationChart.vue'
-import { NewRecordIcon, ViewReportIcon, CalendarIcon } from '@/components/icons/blood-glucose'
+import { NewRecordIcon, ViewReportIcon, CalendarIcon } from '@/icons/blood-glucose'
 import { formatLocalDate, formatLocalDateTime } from '@/utils/time'
 
 const bloodGlucoseStore = useBloodGlucoseStore()

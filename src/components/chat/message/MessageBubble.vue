@@ -92,8 +92,11 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { marked } from 'marked'
-import { AIAvatarIcon, ThinkingCheckmarkIcon, ThinkingToggleIcon, ToolCallResultIcon } from '@/components/icons'
-import { ImageIcon, DefaultFileIcon, ParsingFilesIcon, SearchPulseIcon } from '@/components/icons'
+import { 
+  AIAvatarIcon, ThinkingCheckmarkIcon, ThinkingToggleIcon, 
+  ToolCallResultIcon, ParsingFilesIcon, SearchPulseIcon
+} from '@/icons/message'
+import { ImageIcon, DefaultFileIcon } from '@/icons/input'
 import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
 import { formatLocalDateTime } from '@/utils/time'
 

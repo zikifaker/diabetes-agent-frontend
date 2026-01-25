@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { LLMSelectorToggleIcon } from '@/components/icons'
+import { LLMSelectorToggleIcon } from '@/icons/chat/input'
 
 const props = defineProps({
   modelValue: {

@@ -47,7 +47,7 @@ import MessageBubble from '@/components/chat/message/MessageBubble.vue'
 import ToolCallSidebar from '@/components/layout/ToolCallSidebar.vue'
 import ChatInput from '@/components/chat/input/ChatInput.vue'
 import HealthProfileForm from '@/components/health-profile/HealthProfileForm.vue'
-import { MenuSidebarToggleIcon } from '@/components/icons'
+import { MenuSidebarToggleIcon } from '@/icons/navigation'
 
 const route = useRoute()
 const router = useRouter()

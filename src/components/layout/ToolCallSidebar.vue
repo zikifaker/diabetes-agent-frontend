@@ -48,10 +48,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import JsonViewer from 'vue-json-viewer';
-import 'vue-json-viewer/style.css';
-import { CloseIcon } from '@/components/icons';
+import { ref } from 'vue'
+import JsonViewer from 'vue-json-viewer'
+import 'vue-json-viewer/style.css'
+import { CloseIcon } from '@/icons'
 
 defineProps({
   visible: {

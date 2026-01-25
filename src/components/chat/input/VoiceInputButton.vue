@@ -20,7 +20,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import api from '@/services/api'
 import workletURL from '@/utils/recorder_worklet.js?url'
-import { VoiceInputIcon } from '@/components/icons'
+import { VoiceInputIcon } from '@/icons/chat/input'
 
 const props = defineProps({
   isListening: {
