@@ -19,13 +19,76 @@
 
         <form @submit.prevent="saveProfile" class="modern-form">
           <div class="form-grid">
-            <div class="form-section">
-              <label>糖尿病类型</label>
-              <div v-if="!isEditing" class="read-only-value">
-                {{ diabetesTypeLabel }}
+            <div class="field-group">
+              <div class="group-header">基础信息</div>
+              <div class="form-section">
+                <label>性别</label>
+                <div v-if="!isEditing" class="read-only-value">{{ genderLabel }}</div>
+                <select v-else v-model="profile.gender" class="modern-input">
+                  <option value="male">男</option>
+                  <option value="female">女</option>
+                  <option value="other">其他</option>
+                </select>
               </div>
-              <div v-else class="input-wrapper">
-                <select v-model="profile.diabetesType" class="modern-input">
+              <div class="form-section">
+                <label>年龄</label>
+                <div v-if="!isEditing" class="read-only-value">{{ profile.age || '-' }} 岁</div>
+                <input v-else type="number" v-model="profile.age" min="0" placeholder="请输入年龄" class="modern-input">
+              </div>
+              <div class="form-section">
+                <label>身高(cm)</label>
+                <div v-if="!isEditing" class="read-only-value">
+                  {{ profile.height || '-' }} cm
+                </div>
+                <div v-else class="dual-input">
+                  <input type="number" v-model="profile.height" min="0" placeholder="身高(cm)" class="modern-input">
+                </div>
+              </div>
+              <div class="form-section">
+                <label>体重(kg)</label>
+                <div v-if="!isEditing" class="read-only-value">
+                  {{ profile.weight || '-' }} kg
+                </div>
+                <div v-else class="dual-input">
+                  <input type="number" v-model="profile.weight" min="0" step="0.1" placeholder="体重(kg)"
+                    class="modern-input">
+                </div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <div class="group-header">生活习惯</div>
+              <div class="form-section">
+                <label>吸烟情况</label>
+                <div v-if="!isEditing" class="read-only-value">{{ profile.smokingStatus ? '吸烟' : '不吸烟' }}</div>
+                <select v-else v-model="profile.smokingStatus" class="modern-input">
+                  <option :value="false">不吸烟</option>
+                  <option :value="true">吸烟</option>
+                </select>
+              </div>
+              <div class="form-section">
+                <label>运动等级</label>
+                <div v-if="!isEditing" class="read-only-value">{{ activityLabel }}</div>
+                <select v-else v-model="profile.activityLevel" class="modern-input">
+                  <option value="sedentary">久坐不动</option>
+                  <option value="light">轻度活跃</option>
+                  <option value="moderate">中度活跃</option>
+                  <option value="heavy">高强度运动</option>
+                </select>
+              </div>
+              <div class="form-section">
+                <label>饮食偏好</label>
+                <div v-if="!isEditing" class="read-only-value">{{ profile.dietaryPreference }}</div>
+                <input v-else v-model="profile.dietaryPreference" placeholder="如：低糖、少盐、素食等" class="modern-input">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <div class="group-header">医疗背景</div>
+              <div class="form-section">
+                <label>糖尿病类型</label>
+                <div v-if="!isEditing" class="read-only-value">{{ diabetesTypeLabel }}</div>
+                <select v-else v-model="profile.diabetesType" class="modern-input">
                   <option value="none">无</option>
                   <option value="type1">1型糖尿病</option>
                   <option value="type2">2型糖尿病</option>
@@ -33,22 +96,39 @@
                   <option value="other">其他类型</option>
                 </select>
               </div>
-            </div>
-
-            <div class="form-section">
-              <label>当前用药</label>
-              <div v-if="!isEditing" class="read-only-value multiline">
-                {{ profile.medication }}
+              <div class="form-section">
+                <label>患病年数</label>
+                <div v-if="!isEditing" class="read-only-value">{{ profile.diagnosisYear || '-' }}</div>
+                <input v-else type="number" v-model="profile.diagnosisYear" min="0" placeholder="请输入确诊年份"
+                  class="modern-input">
               </div>
-              <textarea v-else v-model="profile.medication" placeholder="请填写您的用药情况" class="modern-input"></textarea>
-            </div>
-
-            <div class="form-section">
-              <label>相关并发症</label>
-              <div v-if="!isEditing" class="read-only-value multiline">
-                {{ profile.complications }}
+              <div class="form-section">
+                <label>治疗模式</label>
+                <div v-if="!isEditing" class="read-only-value">{{ therapyModeLabel }}</div>
+                <select v-else v-model="profile.therapyMode" class="modern-input">
+                  <option value="lifestyle">仅生活方式干预</option>
+                  <option value="oral_meds">口服药物</option>
+                  <option value="insulin">胰岛素治疗</option>
+                  <option value="combined">联合治疗</option>
+                </select>
               </div>
-              <textarea v-else v-model="profile.complications" placeholder="请描述您的并发症状况" class="modern-input"></textarea>
+              <div class="form-section">
+                <label>过敏史</label>
+                <div v-if="!isEditing" class="read-only-value">{{ profile.allergies }}</div>
+                <input v-else v-model="profile.allergies" placeholder="药物或食物过敏史" class="modern-input">
+              </div>
+              <div class="form-section">
+                <label>当前用药</label>
+                <div v-if="!isEditing" class="read-only-value multiline">{{ profile.medication }}</div>
+                <textarea v-else v-model="profile.medication" placeholder="请详细列出您正在服用的药物名称和剂量"
+                  class="modern-input"></textarea>
+              </div>
+              <div class="form-section">
+                <label>相关并发症</label>
+                <div v-if="!isEditing" class="read-only-value multiline">{{ profile.complications }}</div>
+                <textarea v-else v-model="profile.complications" placeholder="请描述已确诊的并发症"
+                  class="modern-input"></textarea>
+              </div>
             </div>
           </div>
 
@@ -58,7 +138,6 @@
                 <button type="button" @click="cancelEdit" class="btn-cancel" :disabled="loading">
                   取消
                 </button>
-
                 <button type="submit" class="btn-save" :disabled="loading">
                   <span v-if="loading" class="loader"></span>
                   {{ loading ? '保存中...' : '保存' }}
@@ -79,8 +158,8 @@
 
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue'
-import { useHealthProfileStore } from '@/stores/health_profile'
 import { storeToRefs } from 'pinia'
+import { useHealthProfileStore } from '@/stores/health_profile'
 import { EditIcon, CloseIcon } from '@/icons/common'
 
 const emit = defineEmits(['close'])
@@ -92,8 +171,18 @@ const loading = ref(false)
 const isEditing = ref(false)
 
 const profile = ref({
+  gender: 'male',
+  age: null,
+  height: null,
+  weight: null,
+  dietaryPreference: '',
+  smokingStatus: false,
+  activityLevel: 'sedentary',
   diabetesType: 'none',
+  diagnosisYear: null,
+  therapyMode: 'lifestyle',
   medication: '',
+  allergies: '',
   complications: ''
 })
 
@@ -103,15 +192,38 @@ const toast = ref({
   type: 'success'
 })
 
-const diabetesTypeOptions = {
+const DIABETES_TYPE_MAP = {
+  none: '无',
   type1: '1型糖尿病',
   type2: '2型糖尿病',
   gestational: '妊娠期糖尿病',
-  other: '其他类型',
-  none: '无'
+  other: '其他类型'
 }
 
-const diabetesTypeLabel = computed(() => diabetesTypeOptions[profile.value.diabetesType] || '')
+const GENDER_MAP = {
+  male: '男',
+  female: '女',
+  other: '其他'
+}
+
+const ACTIVITY_MAP = {
+  sedentary: '极少运动',
+  light: '轻强度',
+  moderate: '中强度',
+  heavy: '高强度'
+}
+
+const THERAPY_MAP = {
+  lifestyle: '仅生活方式',
+  oral_meds: '口服药物',
+  insulin: '胰岛素',
+  combined: '联合治疗'
+}
+
+const genderLabel = computed(() => GENDER_MAP[profile.value.gender] || '-')
+const activityLabel = computed(() => ACTIVITY_MAP[profile.value.activityLevel] || '-')
+const therapyModeLabel = computed(() => THERAPY_MAP[profile.value.therapyMode] || '-')
+const diabetesTypeLabel = computed(() => DIABETES_TYPE_MAP[profile.value.diabetesType] || '-')
 
 async function saveProfile() {
   loading.value = true
@@ -122,24 +234,13 @@ async function saveProfile() {
       await healthProfileStore.createProfile(profile.value)
     }
     isEditing.value = false
-    showToast('档案保存成功', 'success')
+    showToast('档案保存成功')
   } catch (error) {
+    console.error(error)
     showToast('档案保存失败', 'error')
-    console.error('Failed to save profile:', error)
   } finally {
     loading.value = false
   }
-}
-
-function showToast(message, type = 'success') {
-  toast.value = {
-    show: true,
-    message,
-    type
-  }
-  setTimeout(() => {
-    toast.value.show = false
-  }, 1500)
 }
 
 function cancelEdit() {
@@ -149,18 +250,21 @@ function cancelEdit() {
   isEditing.value = false
 }
 
-watch(healthProfile, (newVal) => {
-  if (newVal) {
-    profile.value = { ...newVal }
-  }
-}, { immediate: true })
+function showToast(message, type = 'success') {
+  toast.value = { show: true, message, type }
+  setTimeout(() => (toast.value.show = false), 1500)
+}
 
-onMounted(async () => {
-  try {
-    await healthProfileStore.fetchProfile()
-  } catch (error) {
-    console.error("Failed to fetch health profile", error)
-  }
+watch(
+  healthProfile,
+  (val) => {
+    if (val) profile.value = { ...val }
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  healthProfileStore.fetchProfile().catch(console.error)
 })
 </script>
 
@@ -181,7 +285,7 @@ onMounted(async () => {
   max-width: 580px;
   max-height: 85vh;
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 6px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -264,14 +368,14 @@ onMounted(async () => {
 }
 
 .form-section {
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 .form-section label {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: #475569;
   margin-bottom: 6px;
@@ -319,7 +423,6 @@ textarea.modern-input,
 
 .form-actions-wrapper {
   min-height: 60px;
-  margin-top: 12px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -344,15 +447,25 @@ textarea.modern-input,
 }
 
 .btn-save {
-  background: #4285F4;
+  background: var(--primary-color);
   color: white;
   border: none;
+}
+
+.btn-save:hover {
+  background: var(--primary-hover);
+  color: var(--text-primary);
 }
 
 .btn-cancel {
   background: #fff;
   border: 1px solid #e2e8f0;
   color: #64748b;
+}
+
+.btn-cancel:hover {
+  background: var(--hover-bg);
+  color: var(--text-secondary);
 }
 
 .slide-up-enter-active,
@@ -413,5 +526,54 @@ textarea.modern-input,
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.field-group {
+  padding: 12px 16px;
+  background: #fcfdfe;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  margin-bottom: 15px;
+}
+
+.group-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: #4285F4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-header::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.dual-input {
+  display: flex;
+  gap: 10px;
+}
+
+.dual-input .modern-input {
+  flex: 1;
+}
+
+.profile-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.profile-card::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.profile-card::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>
