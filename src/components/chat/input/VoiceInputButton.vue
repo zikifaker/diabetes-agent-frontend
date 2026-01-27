@@ -18,8 +18,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import RecordRTC from 'recordrtc'
 import api from '@/services/api'
-import workletURL from '@/utils/recorder_worklet.js?url'
 import { VoiceInputIcon } from '@/icons/chat/input'
 
 const props = defineProps({
@@ -47,107 +47,36 @@ const toggleVoiceInput = () => {
 }
 
 const startListening = async () => {
-  let audioChunks = []
-  let audioContext = null
-  let workletNode = null
-  let audioData = []
-
   try {
-    const sampleRate = 16000
-    const audioConstraints = {
-      audio: {
-        sampleRate,
-        channelCount: 1,
-        echoCancellation: true,
-        noiseSuppression: true,
-      },
-    }
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
 
-    const stream = await navigator.mediaDevices.getUserMedia(audioConstraints)
-    audioContext = new AudioContext({ sampleRate })
+    // 启动后台线程将音频流编码为 WAV 格式
+    mediaRecorder = new RecordRTC(stream, {
+      type: 'audio',
+      mimeType: 'audio/wav',
+      recorderType: RecordRTC.StereoAudioRecorder,
+      numberOfAudioChannels: 1,
+      desiredSampRate: 16000,
+      useWorker: true
+    })
 
-    await audioContext.audioWorklet.addModule(workletURL)
-
-    const source = audioContext.createMediaStreamSource(stream)
-    workletNode = new AudioWorkletNode(audioContext, 'recorder-processor')
-
-    workletNode.port.onmessage = (e) => {
-      audioData.push(e.data.buffer)
-    }
-
-    source.connect(workletNode)
-    workletNode.connect(audioContext.destination)
-
-    mediaRecorder = new MediaRecorder(stream)
-
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        audioChunks.push(event.data)
-      }
-    }
-
-    mediaRecorder.onstop = async () => {
-      source.disconnect()
-      workletNode.disconnect()
-
-      const wavBlob = createWAVBlob(audioData, sampleRate)
-      await fetchVoiceRecognitionResult(wavBlob)
-
-      audioChunks = []
-      audioData = []
-    }
-
-    mediaRecorder.start()
+    mediaRecorder.startRecording()
     isListening.value = true
     emit('update:isListening', true)
   } catch (error) {
     setError('无法访问麦克风')
-    console.error('Error accessing microphone:', error)
   }
-}
-
-// 创建 PCM 编码的 WAV 文件
-function createWAVBlob(pcmArrays, sampleRate) {
-  const pcmData = new Int16Array(pcmArrays.reduce((acc, val) => acc + val.length, 0))
-  let offset = 0
-  for (const chunk of pcmArrays) {
-    pcmData.set(chunk, offset)
-    offset += chunk.length
-  }
-
-  const wavData = new DataView(new ArrayBuffer(44 + pcmData.length * 2))
-
-  const writeString = (view, offset, string) => {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i))
-    }
-  }
-
-  writeString(wavData, 0, 'RIFF')
-  wavData.setUint32(4, 36 + pcmData.length * 2, true)
-  writeString(wavData, 8, 'WAVE')
-  writeString(wavData, 12, 'fmt ')
-  wavData.setUint32(16, 16, true)
-  wavData.setUint16(20, 1, true)
-  wavData.setUint16(22, 1, true)
-  wavData.setUint32(24, sampleRate, true)
-  wavData.setUint32(28, sampleRate * 2, true)
-  wavData.setUint16(32, 2, true)
-  wavData.setUint16(34, 16, true)
-  writeString(wavData, 36, 'data')
-  wavData.setUint32(40, pcmData.length * 2, true)
-
-  for (let i = 0; i < pcmData.length; i++) {
-    wavData.setInt16(44 + (i * 2), pcmData[i], true)
-  }
-
-  return new Blob([wavData], { type: 'audio/wav' })
 }
 
 const stopListening = () => {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop()
-  }
+  mediaRecorder.stopRecording(async () => {
+    const blob = mediaRecorder.getBlob()
+    await fetchVoiceRecognitionResult(blob)
+    
+    mediaRecorder.destroy()
+    mediaRecorder = null
+  })
+  
   isListening.value = false
   emit('update:isListening', false)
 }

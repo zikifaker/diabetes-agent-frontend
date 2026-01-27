@@ -89,7 +89,7 @@
 
       <div v-if="message.content" class="message-content-wrapper">
         <div class="message-text markdown-body" v-html="renderMarkdown(message.content)"></div>
-        <button @click="copyMessage" class="copy-button-modern" :data-tooltip="copyTooltip">
+        <button v-if="!streaming" @click="copyMessage" class="copy-button-modern" :data-tooltip="copyTooltip">
           <CopyIcon />
         </button>
       </div>
