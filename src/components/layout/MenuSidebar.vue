@@ -21,6 +21,10 @@
         <span class="menu-text">健康档案</span>
       </button>
 
+      <router-link to="/report" class="menu-button">
+        <ViewReportIcon />
+        <span class="menu-text">报告</span>
+      </router-link>
       <div class="section-divider">
         <ChatHistoryIcon />
         <span class="menu-text">会话历史</span>
@@ -53,26 +57,20 @@
 
     <div class="sidebar-footer">
       <div class="user-menu">
-        <button @click="toggleUserMenu" class="user-button">
-          <img :src="authStore.user?.avatar || 'https://via.placeholder.com/32'" :alt="authStore.user?.email"
-            class="user-avatar" />
+        <button @click.stop="toggleUserMenu" class="user-button">
+          <img :src="authStore.user?.avatar" :alt="authStore.user?.email" class="user-avatar" />
           <span class="user-name">{{ authStore.user?.email }}</span>
         </button>
 
-        <div v-if="showUserMenu" class="user-dropdown">
-          <div class="user-info">
-            <img :src="authStore.user?.avatar || 'https://via.placeholder.com/48'" :alt="authStore.user?.email"
-              class="user-avatar-large" />
-            <div>
-              <div class="user-name-large">{{ authStore.user?.email }}</div>
-            </div>
+        <Transition name="dropdown">
+          <div v-show="showUserMenu" class="user-dropdown">
+            <div class="dropdown-divider"></div>
+            <button @click="handleLogout" class="dropdown-item">
+              <LogoutIcon />
+              <span>退出登录</span>
+            </button>
           </div>
-          <div class="dropdown-divider"></div>
-          <button @click="handleLogout" class="dropdown-item">
-            <LogoutIcon />
-            退出登录
-          </button>
-        </div>
+        </Transition>
       </div>
     </div>
   </aside>
@@ -105,7 +103,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useSessionStore } from '@/stores/session'
 import {
   NewChatIcon, KnowledgeBaseIcon, BloodGlucoseIcon,
-  HealthProfileIcon, ChatHistoryIcon, LogoutIcon
+  HealthProfileIcon, ChatHistoryIcon, LogoutIcon,
+  ViewReportIcon
 } from '@/icons/navigation'
 import { MenuIcon, CloseIcon } from '@/icons/common'
 
@@ -472,59 +471,51 @@ button.menu-button {
 
 .user-dropdown {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + 8px);
   left: 0;
   right: 0;
-  margin-bottom: 8px;
-  background: var(--white);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   z-index: 100;
+  transform-origin: bottom center;
 }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.25s cubic-bezier(0.24, 0.22, 0.31, 1.07);
 }
 
-.user-avatar-large {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
 }
 
-.user-name-large {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.dropdown-divider {
-  height: 1px;
-  background: var(--border-color);
+.dropdown-enter-to,
+.dropdown-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .dropdown-item {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 12px 16px;
-  color: var(--text-primary);
+  color: #ef4444;
   font-size: 14px;
-  transition: var(--transition);
-  text-align: left;
+  transition: background-color 0.2s ease;
   background: none;
   border: none;
   cursor: pointer;
 }
 
 .dropdown-item:hover {
-  background: var(--hover-bg);
+  background: rgba(239, 68, 68, 0.05);
 }
 
 .modal-overlay {
