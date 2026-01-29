@@ -341,7 +341,7 @@ onUnmounted(() => {
 
 .page-title {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-primary);
   margin: 0;
 }

@@ -35,6 +35,12 @@ const routes = [
     name: 'BloodGlucose',
     component: () => import('../views/BloodGlucoseAnalysisView.vue'),
     meta: { requiresAuth: true }
+  },
+    {
+    path: '/exercise',
+    name: 'Exercise',
+    component: () => import('../views/ExerciseView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

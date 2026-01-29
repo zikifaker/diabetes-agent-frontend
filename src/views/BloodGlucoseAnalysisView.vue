@@ -2,7 +2,7 @@
   <div class="analysis-wrapper">
     <header class="analysis-header">
       <div>
-        <h1>血糖分析</h1>
+        <h1>血糖记录</h1>
         <p class="date-range">数据范围：{{ displayDateRange }}</p>
       </div>
 

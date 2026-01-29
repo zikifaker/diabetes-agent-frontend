@@ -6,7 +6,23 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     vue(),
-    svgLoader(svgLoaderConfig),
+    svgLoader({
+      defaultImport: 'component',
+      svgo: true,
+      svgoConfig: {
+        plugins: [
+          {
+            name: 'preset-default',
+            params: {
+              overrides: {
+                removeViewBox: false,
+                cleanupIDs: false,
+              },
+            },
+          },
+        ],
+      },
+    }),
   ],
   server: {
     port: 5173,
@@ -17,21 +33,3 @@ export default defineConfig({
     }
   }
 })
-
-const svgLoaderConfig = {
-  defaultImport: 'component',
-  svgo: true,
-  svgoConfig: {
-    plugins: [
-      {
-        name: 'preset-default',
-        params: {
-          overrides: {
-            removeViewBox: false,
-            cleanupIDs: false,
-          },
-        },
-      },
-    ],
-  },
-}

@@ -16,15 +16,20 @@
         <span class="menu-text">血糖记录</span>
       </router-link>
 
+      <router-link to="/exercise" class="menu-button">
+        <ExerciseIcon />
+        <span class="menu-text">运动记录</span>
+      </router-link>
+
+      <router-link to="/" class="menu-button">
+        <ViewReportIcon />
+        <span class="menu-text">健康报告</span>
+      </router-link>
+
       <button @click="$emit('show-health-profile')" class="menu-button">
         <HealthProfileIcon />
         <span class="menu-text">健康档案</span>
       </button>
-
-      <router-link to="/report" class="menu-button">
-        <ViewReportIcon />
-        <span class="menu-text">报告</span>
-      </router-link>
       <div class="section-divider">
         <ChatHistoryIcon />
         <span class="menu-text">会话历史</span>
@@ -104,7 +109,7 @@ import { useSessionStore } from '@/stores/session'
 import {
   NewChatIcon, KnowledgeBaseIcon, BloodGlucoseIcon,
   HealthProfileIcon, ChatHistoryIcon, LogoutIcon,
-  ViewReportIcon
+  ViewReportIcon, ExerciseIcon
 } from '@/icons/navigation'
 import { MenuIcon, CloseIcon } from '@/icons/common'
 
