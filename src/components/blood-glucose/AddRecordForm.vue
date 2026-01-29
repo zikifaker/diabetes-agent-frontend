@@ -42,8 +42,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import dayjs from 'dayjs'
 import { CloseIcon } from '@/icons/common'
-import { formatLocalDateTime } from '@/utils/time'
 
 const props = defineProps({
   show: {
@@ -56,7 +56,7 @@ const emit = defineEmits(['close', 'save'])
 
 const form = ref({
   value: 5.5,
-  measuredAt: formatLocalDateTime(new Date()),
+  measuredAt: dayjs(new Date()).format('YYYY-MM-DD HH:mm'),
   diningStatus: 'fasting'
 })
 

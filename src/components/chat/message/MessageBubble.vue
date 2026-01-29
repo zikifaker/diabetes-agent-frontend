@@ -9,7 +9,7 @@
 
     <div class="message-content">
       <div class="message-header">
-        <span class="message-time">{{ formatLocalDateTime(message.createdAt) }}</span>
+        <span class="message-time">{{ dayjs(message.createdAt).format('YYYY-MM-DD HH:mm') }}</span>
       </div>
 
       <div v-if="message.role === 'human' && message.uploadedFiles?.length > 0" class="uploaded-files-grid">
@@ -99,6 +99,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import dayjs from 'dayjs'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { marked } from 'marked'
@@ -109,7 +110,6 @@ import {
 import { ImageIcon, DefaultFileIcon } from '@/icons/chat/input'
 import { CopyIcon } from '@/icons/common'
 import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
-import { formatLocalDateTime } from '@/utils/time'
 
 const props = defineProps({
   message: Object,

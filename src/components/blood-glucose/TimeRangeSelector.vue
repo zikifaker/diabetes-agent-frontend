@@ -11,10 +11,10 @@
       <transition name="slide-fade">
         <div v-if="rangeType === 'custom'" class="custom-panel">
           <div class="date-input-group">
-            <input type="date" :value="formatLocalDate(customRange.start)"
+            <input type="date" :value="dayjs(customRange.start).format('YYYY-MM-DD')"
               @change="e => updateRange('start', e.target.value)" />
             <span class="separator">至</span>
-            <input type="date" :value="formatLocalDate(customRange.end)"
+            <input type="date" :value="dayjs(customRange.end).format('YYYY-MM-DD')"
               @change="e => updateRange('end', e.target.value)" />
           </div>
         </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { formatLocalDate } from '@/utils/time'
+import dayjs from 'dayjs'
 
 const props = defineProps({
   rangeType: {

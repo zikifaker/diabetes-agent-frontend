@@ -16,10 +16,10 @@
         <span class="menu-text">血糖记录</span>
       </router-link>
 
-      <router-link to="/exercise" class="menu-button">
+      <!-- <router-link to="/exercise" class="menu-button">
         <ExerciseIcon />
         <span class="menu-text">运动记录</span>
-      </router-link>
+      </router-link> -->
 
       <router-link to="/" class="menu-button">
         <ViewReportIcon />

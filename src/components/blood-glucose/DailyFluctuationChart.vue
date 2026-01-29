@@ -8,7 +8,7 @@
 import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip } from 'chart.js'
-import { formatLocalTimeHour } from '@/utils/time'
+import dayjs from 'dayjs'
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip)
 
@@ -31,10 +31,10 @@ const dayRecords = computed(() => {
 })
 
 const data = computed(() => ({
-  labels: dayRecords.value.map(r => formatLocalTimeHour(r.measuredAt)),
+  labels: dayRecords.value.map(r => dayjs(r.measuredAt).format('HH:mm')),
   datasets: [{
     data: dayRecords.value.map(r => ({
-      x: formatLocalTimeHour(r.measuredAt),
+      x: dayjs(r.measuredAt).format('HH:mm'),
       y: r.value,
       diningStatus: r.diningStatus
     })),

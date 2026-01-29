@@ -33,8 +33,8 @@
           <h3 class="card-title">单日血糖波动</h3>
           <div class="date-picker-wrapper">
             <CalendarIcon class="calendar-icon" />
-            <input type="date" v-model="selectedDate" class="date-picker" :min="formatLocalDate(customDateRange.start)"
-              :max="formatLocalDate(customDateRange.end)" />
+            <input type="date" v-model="selectedDate" class="date-picker" :min="dayjs(customDateRange.start).format('YYYY-MM-DD')"
+              :max="dayjs(customDateRange.end).format('YYYY-MM-DD')" />
           </div>
         </div>
         <div class="chart-container">
@@ -53,10 +53,10 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import dayjs from 'dayjs'
 import { useBloodGlucoseStore } from '@/stores/blood_glucose'
 import { TimeRangeSelector, AddRecordForm, TargetRateCard, DailyAverageChart, DailyFluctuationChart } from '@/components/blood-glucose'
 import { NewRecordIcon, CalendarIcon } from '@/icons/blood-glucose'
-import { formatLocalDate, formatLocalDateTime } from '@/utils/time'
 
 const bloodGlucoseStore = useBloodGlucoseStore()
 const { records } = storeToRefs(bloodGlucoseStore)
@@ -80,7 +80,7 @@ const toast = ref({
 
 const displayDateRange = computed(() => {
   const { start, end } = customDateRange.value
-  return `${formatLocalDateTime(start)} ~ ${formatLocalDateTime(end)}`
+  return `${dayjs(start).format('YYYY-MM-DD HH:mm')} ~ ${dayjs(end).format('YYYY-MM-DD HH:mm')}`
 })
 
 const filteredRecords = computed(() => {
