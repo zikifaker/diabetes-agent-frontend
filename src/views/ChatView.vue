@@ -1,7 +1,6 @@
 <template>
   <div class="chat-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat"
-      @show-health-profile="showHealthProfileModal = true" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat" />
 
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <div class="chat-wrapper">
@@ -29,8 +28,6 @@
           @close="closeToolCallSidebar" />
       </div>
     </main>
-
-    <HealthProfileForm v-if="showHealthProfileModal" @close="showHealthProfileModal = false" />
   </div>
 </template>
 
@@ -44,7 +41,6 @@ import { useLLMOptionsStore } from '@/stores/llm_options'
 import { MenuSidebar, ToolCallSidebar } from '@/components/layout'
 import { LLMSelector, ChatInput } from '@/components/chat/input'
 import { MessageBubble } from '@/components/chat/message'
-import { HealthProfileForm } from '@/components/health-profile'
 import { MenuSidebarToggleIcon } from '@/icons/navigation'
 
 const route = useRoute()
@@ -66,7 +62,6 @@ const { llmOptions, selectedLLM } = storeToRefs(llmOptionsStore)
 const sidebarVisible = ref(true)
 const isToolCallSidebarVisible = ref(false)
 const currentToolCallResults = ref([])
-const showHealthProfileModal = ref(false)
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

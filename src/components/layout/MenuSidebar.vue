@@ -26,10 +26,6 @@
         <span class="menu-text">健康报告</span>
       </router-link>
 
-      <button @click="$emit('show-health-profile')" class="menu-button">
-        <HealthProfileIcon />
-        <span class="menu-text">健康档案</span>
-      </button>
       <div class="section-divider">
         <ChatHistoryIcon />
         <span class="menu-text">会话历史</span>
@@ -69,15 +65,20 @@
 
         <Transition name="dropdown">
           <div v-show="showUserMenu" class="user-dropdown">
-            <div class="dropdown-divider"></div>
+            <button @click="handleShowHealthProfile" class="dropdown-item">
+              <HealthProfileIcon />
+              <span class="dropdown-text">健康档案</span>
+            </button>
             <button @click="handleLogout" class="dropdown-item">
               <LogoutIcon />
-              <span>退出登录</span>
+              <span class="dropdown-text">退出登录</span>
             </button>
           </div>
         </Transition>
       </div>
     </div>
+
+    <HealthProfileForm v-if="showHealthProfile" @close="showHealthProfile = false" />
   </aside>
 
   <Teleport to="body">
@@ -106,10 +107,11 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSessionStore } from '@/stores/session'
+import { HealthProfileForm } from '@/components/health-profile'
 import {
   NewChatIcon, KnowledgeBaseIcon, BloodGlucoseIcon,
   HealthProfileIcon, ChatHistoryIcon, LogoutIcon,
-  ViewReportIcon, ExerciseIcon
+  ViewReportIcon
 } from '@/icons/navigation'
 import { MenuIcon, CloseIcon } from '@/icons/common'
 
@@ -117,7 +119,7 @@ defineProps({
   sidebarVisible: Boolean
 })
 
-defineEmits(['new-chat', 'show-health-profile'])
+defineEmits(['new-chat'])
 
 const route = useRoute()
 const router = useRouter()
@@ -125,6 +127,8 @@ const authStore = useAuthStore()
 const sessionStore = useSessionStore()
 
 const showUserMenu = ref(false)
+const showHealthProfile = ref(false)
+
 const activeSessionMenu = ref(null)
 const showDeleteModal = ref(false)
 const sessionToDelete = ref(null)
@@ -207,6 +211,11 @@ function cancelRename() {
 function handleLogout() {
   authStore.logout()
   router.push('/login')
+}
+
+function handleShowHealthProfile() {
+  showUserMenu.value = false
+  showHealthProfile.value = true
 }
 
 function handleClickOutside(event) {
@@ -511,7 +520,7 @@ button.menu-button {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  color: #ef4444;
+  color: var(--text-primary);
   font-size: 14px;
   transition: background-color 0.2s ease;
   background: none;
@@ -520,7 +529,13 @@ button.menu-button {
 }
 
 .dropdown-item:hover {
-  background: rgba(239, 68, 68, 0.05);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.dropdown-text {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .modal-overlay {

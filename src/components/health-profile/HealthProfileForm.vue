@@ -255,16 +255,16 @@ function showToast(message, type = 'success') {
   setTimeout(() => (toast.value.show = false), 1500)
 }
 
-watch(
-  healthProfile,
-  (val) => {
-    if (val) profile.value = { ...val }
-  },
-  { immediate: true }
-)
+watch(healthProfile, (val) => {
+  if (val) profile.value = { ...val }
+}, { immediate: true })
 
-onMounted(() => {
-  healthProfileStore.fetchProfile().catch(console.error)
+onMounted(async () => {
+  try {
+    await healthProfileStore.fetchProfile()
+  } catch (error) {
+    console.error('Failed to fetch health profile:', error)
+  }
 })
 </script>
 
