@@ -363,6 +363,10 @@ onUnmounted(() => {
   width: 110px;
 }
 
+.search-expand:hover {
+  background: var(--hover-bg);
+}
+
 .search-expand.active {
   width: 260px;
   border-color: var(--primary-color);

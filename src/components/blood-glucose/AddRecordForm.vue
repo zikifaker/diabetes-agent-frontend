@@ -44,6 +44,7 @@
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { CloseIcon } from '@/icons/common'
+import { DINING_STATUS_OPTIONS } from '@/constants/blood_glucose'
 
 const props = defineProps({
   show: {
@@ -60,17 +61,7 @@ const form = ref({
   diningStatus: 'fasting'
 })
 
-const statusOptions = [
-  { label: '空腹', value: 'fasting' },
-  { label: '早餐前', value: 'before_breakfast' },
-  { label: '早餐后', value: 'after_breakfast' },
-  { label: '午餐前', value: 'before_lunch' },
-  { label: '午餐后', value: 'after_lunch' },
-  { label: '晚餐前', value: 'before_dinner' },
-  { label: '晚餐后', value: 'after_dinner' },
-  { label: '睡前', value: 'bedtime' },
-  { label: '随机', value: 'random' }
-]
+const statusOptions = DINING_STATUS_OPTIONS
 
 const handleBloodGlucoseValidation = () => {
   const value = form.value.value

@@ -57,7 +57,8 @@ const startListening = async () => {
       recorderType: RecordRTC.StereoAudioRecorder,
       numberOfAudioChannels: 1,
       desiredSampRate: 16000,
-      useWorker: true
+      useWorker: true,
+      disableLogs: true
     })
 
     mediaRecorder.startRecording()
@@ -273,7 +274,7 @@ watch(() => props.isListening, (newVal) => {
   transform: translateX(-50%);
   background-color: #fef2f2;
   color: #dc2626;
-  padding: 6px 12px;
+  padding: 10px 12px;
   border-radius: 4px;
   font-size: 14px;
   white-space: nowrap;

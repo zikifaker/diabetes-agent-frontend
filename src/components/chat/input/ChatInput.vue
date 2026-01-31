@@ -98,20 +98,18 @@ const toolsOptions = ref([
   {
     label: '糖尿病知识图谱',
     value: 'search_diabetes_knowledge_graph',
+    description: '查询基于 DiaKG 构建的知识图谱，包括临床研究、药物使用、临床病例、诊断和治疗方法等'
   },
   {
-    label: "血糖记录查询",
-    value: 'get_blood_glucose_records'
-  },
-  {
-    label: "健康档案查询",
-    value: 'get_health_profile'
+    label: "健康数据查询",
+    value: 'fetch_health_data',
+    description: '查询用户健康档案、血糖记录、运动记录'
   }
 ])
 
 const agentConfig = ref({
   maxIterations: 5,
-  tools: ['search_diabetes_knowledge_graph', 'get_blood_glucose_records', 'get_health_profile']
+  tools: ['search_diabetes_knowledge_graph', 'fetch_health_data']
 })
 
 function handleSend() {

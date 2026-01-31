@@ -23,7 +23,17 @@
           <div class="section-title">MCP 工具</div>
           <div class="tools-list">
             <div v-for="tool in toolsOptions" :key="tool.value" class="tool-row">
-              <span class="tool-name">{{ tool.label }}</span>
+              <div class="tool-info">
+                <span class="tool-name">{{ tool.label }}</span>
+                <span class="info-tooltip" :data-description="tool.description">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </span>
+              </div>
 
               <label class="switch">
                 <input type="checkbox" :value="tool.value" v-model="localConfig.tools" />
@@ -179,7 +189,6 @@ watch(() => props.show, (isShowing) => {
 
 .tools-list {
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .tool-row {
@@ -189,9 +198,56 @@ watch(() => props.show, (isShowing) => {
   padding: 10px 14px;
 }
 
+.tool-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .tool-name {
   font-size: 14px;
   color: #111827;
+}
+
+.info-tooltip {
+  display: flex;
+  align-items: center;
+  color: #9ca3af;
+  position: relative;
+}
+
+.info-tooltip:hover {
+  color: #6b7280;
+}
+
+.info-tooltip::after {
+  content: attr(data-description);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  width: max-content;
+  max-width: 200px;
+  word-wrap: break-word;
+  white-space: normal;
+  line-height: 1.4;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.info-tooltip:hover::after,
+.info-tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
 }
 
 .switch {

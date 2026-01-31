@@ -11,7 +11,7 @@
             <button v-if="!isEditing" @click="isEditing = true" class="btn-edit-outline">
               <EditIcon /> <span>修改资料</span>
             </button>
-            <button @click="$emit('close')" class="btn-close" title="关闭">
+            <button @click="$emit('close')" class="btn-close">
               <CloseIcon />
             </button>
           </div>
