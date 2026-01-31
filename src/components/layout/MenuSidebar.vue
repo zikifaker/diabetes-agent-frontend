@@ -16,15 +16,15 @@
         <span class="menu-text">血糖记录</span>
       </router-link>
 
-      <!-- <router-link to="/exercise" class="menu-button">
+      <router-link to="/exercise" class="menu-button">
         <ExerciseIcon />
         <span class="menu-text">运动记录</span>
-      </router-link> -->
+      </router-link>
 
-      <router-link to="/" class="menu-button">
+      <!-- <router-link to="/" class="menu-button">
         <ViewReportIcon />
         <span class="menu-text">健康报告</span>
-      </router-link>
+      </router-link> -->
 
       <div class="section-divider">
         <ChatHistoryIcon />
@@ -111,7 +111,7 @@ import { HealthProfileForm } from '@/components/health-profile'
 import {
   NewChatIcon, KnowledgeBaseIcon, BloodGlucoseIcon,
   HealthProfileIcon, ChatHistoryIcon, LogoutIcon,
-  ViewReportIcon
+  ViewReportIcon, ExerciseIcon
 } from '@/icons/navigation'
 import { MenuIcon, CloseIcon } from '@/icons/common'
 
