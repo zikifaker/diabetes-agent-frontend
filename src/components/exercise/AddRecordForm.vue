@@ -55,12 +55,12 @@
 
           <label>
             <span>运动前血糖 (mmol/L)</span>
-            <input v-model.number="form.preGlucose" type="number" step="0.1" min="0" max="100" />
+            <input v-model.number="form.preGlucose" type="number" step="0.1" min="1" max="50" />
           </label>
 
           <label>
             <span>运动后血糖 (mmol/L)</span>
-            <input v-model.number="form.postGlucose" type="number" step="0.1" min="0" max="100" />
+            <input v-model.number="form.postGlucose" type="number" step="0.1" min="1" max="50" />
           </label>
 
           <label class="full-row">

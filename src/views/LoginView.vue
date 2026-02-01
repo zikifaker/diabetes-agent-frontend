@@ -12,7 +12,7 @@
 
         <div class="form-group">
           <label>密码</label>
-          <input v-model="password" type="password" placeholder="输入你的密码" required />
+          <input v-model="password" type="password" placeholder="输入你的密码" required minlength="6" />
         </div>
 
         <button type="submit" class="btn-primary" :disabled="loading">

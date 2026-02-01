@@ -12,7 +12,7 @@
         <div class="form-row">
           <div class="input-group">
             <label>血糖数值 (mmol/L)</label>
-            <input type="number" min="0" max="100" step="0.1" v-model.number="form.value" placeholder="0.0"
+            <input type="number" min="1" max="50" step="0.1" v-model.number="form.value" placeholder="0.0"
               @blur="handleBloodGlucoseValidation" required />
           </div>
           <div class="input-group">
