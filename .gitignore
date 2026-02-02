@@ -1,61 +1,28 @@
-# 日志文件
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# 编辑器目录和文件
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# 本地环境变量文件
+# Vue
+node_modules/
+dist/
 .env.local
 .env.*.local
-
-# 依赖目录
-node_modules
-.pnp
-.pnp.js
-
-# 测试相关
-/coverage
-
-# 生产构建输出
-/dist
-
-# 缓存目录
-.cache
-.temp
-.temp*
-
-# 杂项
-*.local
-
-# 调试日志
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Vite 环境变量
-.env
-.env.*
-!.env.example
-
-# IDE 配置文件
-.idea/
+.DS_Store
 .vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# VSCode
+.vscode/
+*.code-workspace
+.history/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
