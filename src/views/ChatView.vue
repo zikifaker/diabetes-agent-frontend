@@ -37,17 +37,16 @@ import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/stores/session'
 import { useChat } from '@/stores/chat'
-import { useLLMOptionsStore } from '@/stores/llm_options'
 import { MenuSidebar, ToolCallSidebar } from '@/components/layout'
 import { LLMSelector, ChatInput } from '@/components/chat/input'
 import { MessageBubble } from '@/components/chat/message'
 import { MenuSidebarToggleIcon } from '@/icons/navigation'
+import { LLM_OPTIONS } from '@/constants/chat'
 
 const route = useRoute()
 const router = useRouter()
 const sessionStore = useSessionStore()
 const chatStore = useChat()
-const llmOptionsStore = useLLMOptionsStore()
 
 const {
   isLoading,
@@ -57,11 +56,11 @@ const {
   initialMessage
 } = storeToRefs(chatStore)
 
-const { llmOptions, selectedLLM } = storeToRefs(llmOptionsStore)
-
 const sidebarVisible = ref(true)
 const isToolCallSidebarVisible = ref(false)
 const currentToolCallResults = ref([])
+const llmOptions = LLM_OPTIONS
+const selectedLLM = ref(llmOptions[0])
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

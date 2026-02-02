@@ -34,20 +34,20 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useChat } from '@/stores/chat'
 import { useSessionStore } from '@/stores/session'
-import { useLLMOptionsStore } from '@/stores/llm_options'
 import { MenuSidebar } from '@/components/layout'
 import { LLMSelector, ChatInput } from '@/components/chat/input'
 import { MainIcon } from '@/icons/common'
 import { MenuSidebarToggleIcon } from '@/icons/navigation'
+import { LLM_OPTIONS } from '@/constants/chat'
 
 const chatStore = useChat()
 const sessionStore = useSessionStore()
-const llmOptionsStore = useLLMOptionsStore()
 const router = useRouter()
 
 const { isLoading, initialMessage } = storeToRefs(chatStore)
-const { llmOptions, selectedLLM } = storeToRefs(llmOptionsStore)
 
+const llmOptions = LLM_OPTIONS
+const selectedLLM = ref(llmOptions[0])
 const sidebarVisible = ref(true)
 
 function toggleSidebar() {

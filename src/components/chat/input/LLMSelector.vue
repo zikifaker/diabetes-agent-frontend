@@ -36,14 +36,7 @@ const props = defineProps({
   },
   llmOptions: {
     type: Array,
-    required: true,
-    validator: (value) => {
-      return value.every(option =>
-        option.id &&
-        option.name &&
-        option.description
-      )
-    }
+    required: true
   }
 })
 

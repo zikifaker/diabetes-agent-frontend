@@ -63,6 +63,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { AgentConfigModal, VoiceInputButton, FileUploadButton, FileUploadPreview } from '@/components/chat/input'
 import { AgentConfigIcon, SendIcon, StopIcon, KnowledgeBaseRetrievalIcon } from '@/icons/chat/input'
 import { getUploadPolicyToken, uploadToOSS, NAMESPACE } from '@/utils/oss.js'
+import { MCP_TOOL_OPTIONS } from '@/constants/chat'
 
 const props = defineProps({
   loading: {
@@ -93,23 +94,11 @@ const textareaRef = ref(null)
 const isListening = ref(false)
 const uploadedFiles = ref([])
 const enableKnowledgeBaseRetrieval = ref(false)
-
-const toolsOptions = ref([
-  {
-    label: '糖尿病知识图谱',
-    value: 'search_diabetes_knowledge_graph',
-    description: '查询基于 DiaKG 构建的知识图谱，包括临床研究、药物使用、临床病例、诊断和治疗方法等'
-  },
-  {
-    label: "健康数据查询",
-    value: 'fetch_health_data',
-    description: '查询用户健康档案、血糖记录、运动记录'
-  }
-])
+const toolsOptions = MCP_TOOL_OPTIONS
 
 const agentConfig = ref({
   maxIterations: 5,
-  tools: ['search_diabetes_knowledge_graph', 'fetch_health_data']
+  tools: MCP_TOOL_OPTIONS.map(tool => tool.value)
 })
 
 function handleSend() {
