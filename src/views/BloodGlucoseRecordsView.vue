@@ -145,8 +145,8 @@ watch(rangeType, (newType) => {
 }, { immediate: true })
 
 watch(customDateRange, async (newCustom) => {
-  const start = new Date(newCustom.start)
-  const end = new Date(newCustom.end)
+  const start = dayjs(newCustom.start)
+  const end = dayjs(newCustom.end)
   const defaultStart = dayjs().subtract(29, 'days').startOf('day')
   const defaultEnd = dayjs().endOf('day')
 
