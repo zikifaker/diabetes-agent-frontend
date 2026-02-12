@@ -13,10 +13,16 @@
           <h3>健康周报</h3>
           <p class="report-date">{{ formatDateRange(report.startAt, report.endAt) }}</p>
         </div>
-        <button class="download-btn" @click="downloadReport(report)">
-          <DownloadIcon class="btn-icon" />
-          <span>下载报告</span>
-        </button>
+        <div class="action-buttons">
+          <button class="preview-btn" @click="previewReport(report)">
+            <EyeIcon class="btn-icon" />
+            <span>预览</span>
+          </button>
+          <button class="download-btn" @click="downloadReport(report)">
+            <DownloadIcon class="btn-icon" />
+            <span>下载</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -41,8 +47,8 @@ import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useHealthWeeklyReportStore } from '@/stores/health_weekly_report'
-import { DownloadIcon } from '@/icons/common'
-import { getFileDownloadLink, NAMESPACE } from '@/utils/oss'
+import { DownloadIcon, EyeIcon } from '@/assets/icons/health-weekly-report'
+import { getPresignedURL, NAMESPACE } from '@/utils/oss'
 
 const healthWeeklyReportStore = useHealthWeeklyReportStore()
 const { reports, loading } = storeToRefs(healthWeeklyReportStore)
@@ -57,10 +63,25 @@ const formatDateRange = (start, end) => {
   return `${dayjs(start).format('YYYY-MM-DD')} 至 ${dayjs(end).format('YYYY-MM-DD')}`
 }
 
+const previewReport = async (report) => {
+  try {
+    const url = await getPresignedURL(report.fileName, NAMESPACE.HEALTH_WEEKLY_REPORT, {
+      useCustomDomain: true
+    })
+    window.open(url, '_blank', 'noopener,noreferrer')
+  } catch (err) {
+    console.error('Error opening health weekly report preview:', err)
+  }
+}
+
 const downloadReport = async (report) => {
   try {
-    const url = await getFileDownloadLink(report.fileName, NAMESPACE.HEALTH_WEEKLY_REPORT)
-    window.open(url, '_blank')
+    const url = await getPresignedURL(report.fileName, NAMESPACE.HEALTH_WEEKLY_REPORT)
+    const link = document.createElement('a')
+    link.href = url
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
     showToast('报告下载成功', 'success')
   } catch (err) {
     console.error('Failed to download report:', err)
@@ -149,6 +170,12 @@ onMounted(async () => {
   font-size: 0.75rem;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.preview-btn,
 .download-btn {
   display: flex;
   align-items: center;
@@ -164,6 +191,7 @@ onMounted(async () => {
   transition: all 0.2s;
 }
 
+.preview-btn:hover:not(:disabled),
 .download-btn:hover:not(:disabled) {
   background-color: #3b82f6;
   color: white;
