@@ -132,6 +132,18 @@ const parseJSON = (value) => {
   background: none;
   border: none;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
 }
 
 .sidebar-content {

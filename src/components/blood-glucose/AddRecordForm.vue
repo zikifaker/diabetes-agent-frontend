@@ -117,14 +117,18 @@ const handleSubmit = () => {
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s;
 }
 
 .close-icon:hover {
-  background: var(--hover-bg);
-  color: var(--text-primary);
+  background-color: #fee2e2;
+  color: #ef4444;
 }
 
 .modern-form label {
