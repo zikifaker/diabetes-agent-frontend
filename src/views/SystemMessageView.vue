@@ -59,6 +59,37 @@
     <div v-if="toast.show" class="toast" :class="`toast-${toast.type}`">
       {{ toast.message }}
     </div>
+
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="selectedMessage" class="message-modal-overlay" @click.self="selectedMessage = null">
+          <div class="modal-card">
+            <div class="modal-header">
+              <div class="title-section">
+                <h3>{{ selectedMessage.title }}</h3>
+              </div>
+              <button class="close-icon-btn" @click="selectedMessage = null">
+                <CloseIcon />
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <div class="meta-info">
+                <span class="time-label">发布时间：</span>
+                <span class="time-value">{{ formatTime(selectedMessage.createdAt) }}</span>
+              </div>
+              <div class="content-box">
+                <p class="message-text">{{ selectedMessage.content }}</p>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn-confirm" @click="selectedMessage = null">确认</button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -66,7 +97,7 @@
 import { ref, onMounted } from 'vue'
 import { useSystemMessageStore } from '@/stores/system_message'
 import { storeToRefs } from 'pinia'
-import { TrashIcon } from '@/assets/icons/common'
+import { TrashIcon, CloseIcon } from '@/assets/icons/common'
 import dayjs from 'dayjs'
 
 const messageStore = useSystemMessageStore()
@@ -74,6 +105,7 @@ const { messages, totalPages } = storeToRefs(messageStore)
 
 const currentPage = ref(1)
 const currentTab = ref('all')
+const selectedMessage = ref(null)
 
 const toast = ref({
   show: false,
@@ -98,6 +130,7 @@ async function handleMessageClick(msg) {
       console.error("Failed to mark message as read:", error)
     }
   }
+  selectedMessage.value = msg
 }
 
 function formatTime(time) {
@@ -237,7 +270,6 @@ onMounted(() => {
 }
 
 .message-item:hover {
-  border-color: #cbd5e1;
   transform: translateY(-1px);
 }
 
@@ -317,7 +349,8 @@ onMounted(() => {
 .message-body {
   font-size: 13px;
   color: #64748b;
-  overflow: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .delete-btn {
@@ -408,5 +441,140 @@ onMounted(() => {
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.message-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+.modal-header {
+  padding: 24px 24px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title-section h3 {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.close-icon-btn {
+  background: #f8fafc;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-icon-btn:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.modal-body {
+  padding: 0 24px 24px;
+}
+
+.meta-info {
+  margin-bottom: 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.time-label {
+  color: #94a3b8;
+}
+
+.time-value {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.content-box {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #f1f5f9;
+}
+
+.message-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.modal-footer {
+  padding: 16px 24px 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-confirm {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-confirm:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
