@@ -73,11 +73,11 @@
           </div>
           <ThinkingToggleIcon :expanded="showThinking" />
         </div>
-        <transition name="slide-fade">
+        <Transition name="slide-fade">
           <div v-if="showThinking || isThinking" class="thinking-content">
             <div class="thinking-text">{{ message.intermediateSteps }}</div>
           </div>
-        </transition>
+        </Transition>
       </div>
 
       <div v-if="message.role === 'ai' && !isThinking && message.toolCallResults?.length" class="tool-call-trigger">

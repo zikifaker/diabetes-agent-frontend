@@ -1,10 +1,10 @@
 <template>
   <div class="voice-input-container">
-    <transition name="fade">
+    <Transition name="fade">
       <div v-if="error" class="voice-error">
         {{ error }}
       </div>
-    </transition>
+    </Transition>
     <div class="tooltip-container">
       <button @click="toggleVoiceInput" class="btn-voice" :class="{ 'listening': isListening }"
         :aria-label="isListening ? '停止语音输入' : '开始语音输入'" :disabled="!isSupported">

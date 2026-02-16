@@ -8,10 +8,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
-  async function login(email, password) {
+  async function login({ 
+    email, 
+    credential, 
+    type = 'password' 
+  }) {
     const response = await api.post('/user/login', {
       email,
-      password
+      [type === 'password' ? 'password' : 'code']: credential,
+      type
     })
     const authData = response.data.data
     token.value = authData.token
@@ -45,12 +50,17 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user')
   }
 
+  async function sendVerificationCode(email) {
+    await api.post('/user/code', { email })
+  }
+
   return {
     token,
     user,
     isAuthenticated,
     login,
     register,
-    logout
+    logout,
+    sendVerificationCode
   }
 })

@@ -8,7 +8,7 @@
         </button>
       </div>
 
-      <transition name="slide-fade">
+      <Transition name="slide-fade">
         <div v-if="rangeType === 'custom'" class="custom-panel">
           <div class="date-input-group">
             <input type="date" :value="dayjs(customRange.start).format('YYYY-MM-DD')"
@@ -18,7 +18,7 @@
               @change="e => updateRange('end', e.target.value)" />
           </div>
         </div>
-      </transition>
+      </Transition>
     </div>
   </div>
 </template>

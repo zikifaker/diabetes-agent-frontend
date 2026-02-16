@@ -140,7 +140,7 @@
                 </button>
                 <button type="submit" class="btn-save" :disabled="loading">
                   <span v-if="loading" class="loader"></span>
-                  {{ loading ? '保存中...' : '保存' }}
+                  {{ loading ? '...' : '保存' }}
                 </button>
               </div>
             </Transition>

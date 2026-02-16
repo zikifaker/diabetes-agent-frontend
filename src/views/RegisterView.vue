@@ -7,16 +7,16 @@
       <form @submit.prevent="handleRegister" class="auth-form">
         <div class="form-group">
           <label>邮箱</label>
-          <input v-model="email" type="email" placeholder="输入你的邮箱" required />
+          <input v-model="email" type="email" placeholder="输入邮箱，务必确保正确" required />
         </div>
 
         <div class="form-group">
           <label>密码</label>
-          <input v-model="password" type="password" placeholder="输入你的密码（至少6位）" required minlength="6" />
+          <input v-model="password" type="password" placeholder="输入密码（至少6位）" required minlength="6" />
         </div>
 
         <button type="submit" class="btn-primary" :disabled="loading">
-          {{ loading ? '注册...' : '注册' }}
+          {{ loading ? '...' : '注册' }}
         </button>
 
         <div class="error-wrapper">
@@ -48,6 +48,7 @@ const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref('')
+
 let errorTimer = null
 
 async function handleRegister() {
@@ -61,9 +62,7 @@ async function handleRegister() {
     router.push('/')
   } catch (err) {
     error.value = '注册失败'
-    errorTimer = setTimeout(() => {
-      error.value = ''
-    }, 2000)
+    errorTimer = setTimeout(() => {error.value = ''}, 2000)
   } finally {
     loading.value = false
   }
