@@ -24,35 +24,30 @@
         </div>
       </div>
 
-      <div v-if="message.role === 'ai'" class="parsing-animation">
-        <Transition name="status-fade">
-          <div v-if="message.parsingUploadedFiles" class="status-capsule">
+      <template v-if="message.role === 'ai'">
+        <Transition name="status-fade" mode="out-in">
+          <div v-if="message.parsingUploadedFiles" key="parsing" class="status-capsule">
             <ParsingFilesIcon class="icon" />
             <span class="status-text">正在解析文件</span>
             <div class="loading-dots">
               <span>.</span><span>.</span><span>.</span>
             </div>
           </div>
-        </Transition>
 
-        <Transition name="status-fade">
-          <div v-if="message.retrievingKnowledgeBase" class="status-capsule search">
+          <div v-else-if="message.retrievingKnowledgeBase" key="retrieving" class="status-capsule search">
             <SearchPulseIcon class="icon" />
-            <template v-if="message.retrievingKnowledgeBaseChunkNum">
-              <span class="status-text">正在检索知识库 ({{ message.retrievingKnowledgeBaseChunkNum }}个文档)</span>
-              <div class="loading-dots">
-                <span>.</span><span>.</span><span>.</span>
-              </div>
-            </template>
-            <template v-else>
-              <span class="status-text">正在检索知识库</span>
-              <div class="loading-dots">
-                <span>.</span><span>.</span><span>.</span>
-              </div>
-            </template>
+            <span class="status-text">
+              正在检索知识库
+              <template v-if="message.retrievingKnowledgeBaseChunkNum">
+                ({{ message.retrievingKnowledgeBaseChunkNum }}个文档)
+              </template>
+            </span>
+            <div class="loading-dots">
+              <span>.</span><span>.</span><span>.</span>
+            </div>
           </div>
         </Transition>
-      </div>
+      </template>
 
       <div v-if="message.role === 'ai' && message.intermediateSteps" class="thinking-steps">
         <div class="thinking-header" @click="toggleThinking">

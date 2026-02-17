@@ -37,7 +37,7 @@
         :class="{ active: session.id == route.params.id }" @click="selectSession(session)">
         <div class="session-info">
           <input v-if="editingSessionId === session.id" v-model="editingTitle" class="session-title-input"
-            @keydown.enter="confirmRename(session)" @keydown.esc="cancelRename" ref="renameInput" />
+            :ref="el => { if (el) renameInput = el }" @keydown.enter="confirmRename(session)" @blur="cancelRename" />
           <span v-else class="session-title">
             {{ session.title }}
           </span>
@@ -49,7 +49,7 @@
           </button>
 
           <div v-if="activeSessionMenu === session.id" class="session-menu">
-            <button class="menu-item" @click.stop="startRename(session)">重命名</button>
+            <button class="menu-item" @click.stop="startRename(session)">重命名(按 Enter 确认)</button>
             <button class="menu-item delete" @click.stop="deleteSession(session)">删除</button>
           </div>
         </div>
@@ -195,7 +195,10 @@ function startRename(session) {
   editingTitle.value = session.title
 
   nextTick(() => {
+    // 确保输入框获得焦点
     renameInput.value?.focus()
+
+    // 选中输入框中的文本
     renameInput.value?.select()
   })
 }
@@ -432,7 +435,7 @@ button.menu-button {
   background: #ffffff;
   border-radius: 8px;
   padding: 4px 0;
-  min-width: 120px;
+  min-width: 150px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   border: 1px solid var(--border-color);
   z-index: 1000;

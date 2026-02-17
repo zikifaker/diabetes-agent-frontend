@@ -15,7 +15,7 @@
       <form @submit.prevent="handleLogin" class="auth-form">
         <div class="form-group">
           <label>邮箱</label>
-          <input v-model="email" type="email" placeholder="输入邮箱" required />
+          <input v-model="email" type="email" placeholder="输入邮箱" required @input="validateEmail" />
         </div>
         <div v-if="loginType === 'password'" class="form-group">
           <label>密码</label>
@@ -25,7 +25,8 @@
           <label>验证码</label>
           <div class="code-input-group">
             <input v-model="code" type="text" placeholder="输入验证码" required maxlength="6" />
-            <button type="button" class="code-btn" @click="sendVerificationCode" :disabled="countdown > 0">
+            <button type="button" class="code-btn" @click="sendVerificationCode"
+              :disabled="!isEmailValid || countdown > 0">
               {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
             </button>
           </div>
@@ -64,6 +65,7 @@ const loginType = ref('password')
 const email = ref('')
 const password = ref('')
 const code = ref('')
+const isEmailValid = ref(false)
 const countdown = ref(0)
 const loading = ref(false)
 const error = ref('')
@@ -89,6 +91,11 @@ async function handleLogin() {
   } finally {
     loading.value = false
   }
+}
+
+const validateEmail = () => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  isEmailValid.value = regex.test(email.value)
 }
 
 const sendVerificationCode = async () => {

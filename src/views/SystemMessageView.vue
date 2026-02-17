@@ -32,7 +32,7 @@
                 <div class="message-body">{{ msg.content }}</div>
               </div>
 
-              <button class="delete-btn" @click="handleDeleteMessage(msg.id)">
+              <button class="delete-btn" @click.stop="handleDeleteMessage(msg.id)">
                 <TrashIcon />
               </button>
             </div>
