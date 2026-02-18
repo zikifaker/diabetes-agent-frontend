@@ -1,9 +1,16 @@
 <template>
-  <div class="analysis-wrapper">
-    <header class="analysis-header">
+  <div class="report-wrapper">
+    <header class="report-header">
       <div>
         <h1>健康周报</h1>
         <p class="date-range">查看您的健康周报历史记录</p>
+      </div>
+      <div class="notification-toggle">
+        <span class="notification-text">邮件通知</span>
+        <label class="switch">
+          <input type="checkbox" :checked="user?.enableNotification" @change="toggleNotification">
+          <span class="slider round"></span>
+        </label>
       </div>
     </header>
 
@@ -43,15 +50,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useHealthWeeklyReportStore } from '@/stores/health_weekly_report'
+import { useAuthStore } from '@/stores/auth'
 import { DownloadIcon, EyeIcon } from '@/assets/icons/health-weekly-report'
 import { getPresignedURL, NAMESPACE } from '@/utils/oss'
 
 const healthWeeklyReportStore = useHealthWeeklyReportStore()
+const authStore = useAuthStore()
+
 const { reports, loading } = storeToRefs(healthWeeklyReportStore)
+const user = computed(() => authStore.user)
 
 const toast = ref({
   show: false,
@@ -89,13 +100,23 @@ const downloadReport = async (report) => {
   }
 }
 
-function showToast(message, type = 'success') {
+const toggleNotification = async () => {
+  try {
+    const newStatus = !user.value.enableNotification
+    await healthWeeklyReportStore.updateEnableNotification(newStatus)
+    showToast(`邮件通知已${newStatus ? '开启' : '关闭'}`, 'success')
+  } catch (err) {
+    console.error('Failed to update notification settings:', err)
+  }
+}
+
+const showToast = (message, type = 'success') => {
   toast.value = {
     show: true,
     message,
     type
   }
-  setTimeout(() => { toast.value.show = false }, 1500)
+  setTimeout(() => { toast.value.show = false }, 1000)
 }
 
 onMounted(async () => {
@@ -108,22 +129,87 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.analysis-wrapper {
+.report-wrapper {
   background: #f4f7fa;
   min-height: 100vh;
   padding: 24px 32px;
 }
 
-.analysis-header {
+.report-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 12px;
 }
 
-.analysis-header h1 {
+.report-header h1 {
   font-size: 24px;
   font-weight: 700;
+}
+
+.notification-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.notification-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  margin-right: 8px;
+  transition: color 0.2s ease;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked+.slider {
+  background-color: #3b82f6;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #3b82f6;
+}
+
+input:checked+.slider:before {
+  transform: translateX(20px);
 }
 
 .date-range {

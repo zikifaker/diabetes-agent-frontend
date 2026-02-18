@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
 export const useHealthWeeklyReportStore = defineStore('healthWeeklyReport', () => {
+  const authStore = useAuthStore()
+
   const reports = ref([])
   const loading = ref(false)
 
@@ -23,9 +26,19 @@ export const useHealthWeeklyReportStore = defineStore('healthWeeklyReport', () =
     }
   }
 
+  async function updateEnableNotification(isEnabled) {
+    try {
+      await api.put('/health-weekly-reports/notification', { enable_weekly_report_notification: isEnabled })
+      authStore.updateUser({ enableNotification: isEnabled })
+    } catch (err) {
+      throw err
+    }
+  }
+
   return {
     reports,
     loading,
-    fetchReports
+    fetchReports,
+    updateEnableNotification
   }
 })

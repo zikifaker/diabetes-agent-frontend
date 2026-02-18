@@ -2,7 +2,7 @@ export const LLM_OPTIONS = [
   {
     id: 'qwen3-max',
     name: 'Qwen3 Max',
-    description: '千问系列最强大模型，适合复杂任务'
+    description: '千问系列模型，达到领域 SOTA 水平'
   },
   {
     id: 'glm-4.7',
@@ -10,9 +10,9 @@ export const LLM_OPTIONS = [
     description: '智谱 AI 专为智能体设计的混合推理模型'
   },
   {
-    id: 'kimi-k2.5',
-    name: 'Kimi-K2.5',
-    description: 'Kimi 系列迄今最全能的模型，在通用智能任务上取得开源 SOTA 表现'
+    id: 'MiniMax-M2.1',
+    name: 'MiniMax-M2.1',
+    description: 'MiniMax 推出的旗舰级开源大模型，聚焦真实世界复杂任务'
   }
 ]
 

@@ -245,13 +245,11 @@ function showToast(message, type = 'success') {
 }
 
 function toggleFileMenu(fileName) {
-  activeFileMenu.value =
-    activeFileMenu.value === fileName ? null : fileName
+  activeFileMenu.value = activeFileMenu.value === fileName ? null : fileName
 }
 
 async function handleDownload(fileName) {
   activeFileMenu.value = null
-
   try {
     const url = await getPresignedURL(fileName, NAMESPACE.KNOWLEDGE_BASE)
     const link = document.createElement('a')
@@ -312,7 +310,6 @@ function handleGlobalClick() {
 
 onMounted(async () => {
   document.addEventListener('click', handleGlobalClick)
-
   try {
     await knowledgeBaseStore.fetchFiles(true)
   } catch (error) {

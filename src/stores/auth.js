@@ -8,10 +8,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
-  async function login({ 
-    email, 
-    credential, 
-    type = 'password' 
+  async function login({
+    email,
+    credential,
+    type = 'password'
   }) {
     const response = await api.post('/user/login', {
       email,
@@ -22,7 +22,8 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = authData.token
     user.value = {
       email: authData.email,
-      avatar: authData.avatar
+      avatar: authData.avatar,
+      enableNotification: authData.enable_weekly_report_notification
     }
     localStorage.setItem('token', authData.token)
     localStorage.setItem('user', JSON.stringify(user.value))
@@ -37,7 +38,8 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = authData.token
     user.value = {
       email: authData.email,
-      avatar: authData.avatar
+      avatar: authData.avatar,
+      enableNotification: authData.enable_weekly_report_notification
     }
     localStorage.setItem('token', authData.token)
     localStorage.setItem('user', JSON.stringify(user.value))
@@ -54,6 +56,11 @@ export const useAuthStore = defineStore('auth', () => {
     await api.post('/user/code', { email })
   }
 
+  function updateUser(updates) {
+    user.value = { ...user.value, ...updates };
+    localStorage.setItem('user', JSON.stringify(user.value));
+  }
+
   return {
     token,
     user,
@@ -61,6 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    sendVerificationCode
+    sendVerificationCode,
+    updateUser
   }
 })
