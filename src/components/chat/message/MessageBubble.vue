@@ -34,7 +34,7 @@
             </div>
           </div>
 
-          <div v-else-if="message.retrievingKnowledgeBase" key="retrieving" class="status-capsule search">
+          <div v-else-if="message.retrievingKnowledgeBase" key="retrieving" class="status-capsule">
             <SearchPulseIcon class="icon" />
             <span class="status-text">
               正在检索知识库
@@ -42,6 +42,12 @@
                 ({{ message.retrievingKnowledgeBaseChunkNum }}个文档)
               </template>
             </span>
+            <div class="loading-dots">
+              <span>.</span><span>.</span><span>.</span>
+            </div>
+          </div>
+
+          <div v-else-if="!message.intermediateSteps" key="loading" class="status-capsule">
             <div class="loading-dots">
               <span>.</span><span>.</span><span>.</span>
             </div>
@@ -654,6 +660,11 @@ function exportMessage() {
 }
 
 .loading-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-bottom: 8px;
   animation: opacity-dots 1.4s infinite;
   opacity: 0;
 }
