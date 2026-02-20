@@ -53,7 +53,11 @@ const routes = [
     name: 'SystemMessage',
     component: () => import('@/views/SystemMessageView.vue'),
     mata: { requiresAuth: true }
-  }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
+  },
 ]
 
 const router = createRouter({

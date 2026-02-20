@@ -26,3 +26,6 @@ yarn-error.log*
 *.ipr
 out/
 .idea_modules/
+
+# Custom Rules
+.env

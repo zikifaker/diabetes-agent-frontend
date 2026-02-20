@@ -2,6 +2,7 @@ import { ref, nextTick } from 'vue'
 import { defineStore } from 'pinia'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useSessionStore } from '@/stores/session'
+import.meta.env.VITE_API_BASE_URL
 
 export const useChat = defineStore('chat', () => {
   const sessionStore = useSessionStore()
@@ -40,7 +41,7 @@ export const useChat = defineStore('chat', () => {
     }
 
     try {
-      await fetchEventSource('http://localhost:8088/api/chat', {
+      await fetchEventSource(`${import.meta.env.VITE_API_BASE_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
