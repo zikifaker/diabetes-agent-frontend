@@ -1,5 +1,1 @@
-export { default as AgentConfigModal } from './AgentConfigModal.vue'
 export { default as ChatInput } from './ChatInput.vue'
-export { default as FileUploadButton } from './FileUploadButton.vue'
-export { default as FileUploadPreview } from './FileUploadPreview.vue'
-export { default as VoiceInputButton } from './VoiceInputButton.vue'
