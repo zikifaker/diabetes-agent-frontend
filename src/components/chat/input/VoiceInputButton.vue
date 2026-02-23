@@ -73,11 +73,11 @@ const stopListening = () => {
   mediaRecorder.stopRecording(async () => {
     const blob = mediaRecorder.getBlob()
     await fetchVoiceRecognitionResult(blob)
-    
+
     mediaRecorder.destroy()
     mediaRecorder = null
   })
-  
+
   isListening.value = false
   emit('update:isListening', false)
 }
@@ -269,26 +269,55 @@ watch(() => props.isListening, (newVal) => {
 
 .voice-error {
   position: absolute;
-  bottom: 100%;
+  z-index: 10;
+  bottom: 115%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #fef2f2;
-  color: #dc2626;
-  padding: 10px 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  white-space: nowrap;
-  margin-bottom: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  min-width: max-content;
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.voice-error::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #fca5a5;
+  z-index: -1;
+}
+
+.voice-error::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-1px);
+  border: 5px solid transparent;
+  border-top-color: #fee2e2;
+  filter: drop-shadow(0 2px 1px rgba(239, 68, 68, 0.1));
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: translateX(-50%) translateY(3px);
 }
 </style>
