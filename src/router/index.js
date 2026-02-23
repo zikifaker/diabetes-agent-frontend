@@ -25,31 +25,31 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/my-knowledge-base',
+    path: '/knowledgebase',
     name: 'KnowledgeBase',
     component: () => import('@/views/KnowledgeBaseView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/blood-glucose',
+    path: '/records/glucose',
     name: 'BloodGlucose',
     component: () => import('@/views/BloodGlucoseRecordView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/exercise',
+    path: '/records/exercise',
     name: 'Exercise',
     component: () => import('@/views/ExerciseRecordView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/health-weekly-report',
+    path: '/report',
     name: 'HealthWeeklyReport',
     component: () => import('@/views/HealthWeeklyReportView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/system-message',
+    path: '/system/message',
     name: 'SystemMessage',
     component: () => import('@/views/SystemMessageView.vue'),
     mata: { requiresAuth: true }

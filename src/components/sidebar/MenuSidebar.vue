@@ -6,22 +6,22 @@
         <span class="btn-text">新对话</span>
       </button>
 
-      <router-link to="/my-knowledge-base" class="menu-button">
+      <router-link to="/knowledgebase" class="menu-button">
         <KnowledgeBaseIcon />
         <span class="menu-text">我的知识库</span>
       </router-link>
 
-      <router-link to="/blood-glucose" class="menu-button">
+      <router-link to="/records/glucose" class="menu-button">
         <BloodGlucoseIcon />
         <span class="menu-text">血糖记录</span>
       </router-link>
 
-      <router-link to="/exercise" class="menu-button">
+      <router-link to="/records/exercise" class="menu-button">
         <ExerciseIcon />
         <span class="menu-text">运动记录</span>
       </router-link>
 
-      <router-link to="/health-weekly-report" class="menu-button">
+      <router-link to="/report" class="menu-button">
         <ViewReportIcon />
         <span class="menu-text">健康周报</span>
       </router-link>
@@ -70,7 +70,7 @@
               <span class="dropdown-text">健康档案</span>
             </button>
 
-            <router-link to="/system-message" class="dropdown-item">
+            <router-link to="/system/message" class="dropdown-item">
               <BellIcon />
               <span class="dropdown-text">消息中心</span>
               <span v-if="messageStore.unreadCount > 0" class="unread-badge">
