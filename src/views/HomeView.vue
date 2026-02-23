@@ -16,7 +16,7 @@
             <MainIcon />
           </div>
           <h1>Diabetes Agent</h1>
-          <p>糖尿病诊断智能体</p>
+          <p>你的糖尿病智能体伙伴</p>
         </div>
       </div>
 
@@ -48,7 +48,7 @@ const { isLoading, initialMessage } = storeToRefs(chatStore)
 
 const llmOptions = LLM_OPTIONS
 const selectedLLM = ref(llmOptions[0])
-const sidebarVisible = ref(true)
+const sidebarVisible = ref(false)
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

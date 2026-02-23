@@ -56,7 +56,7 @@ const {
   initialMessage
 } = storeToRefs(chatStore)
 
-const sidebarVisible = ref(true)
+const sidebarVisible = ref(false)
 const isToolCallSidebarVisible = ref(false)
 const currentToolCallResults = ref([])
 const llmOptions = LLM_OPTIONS
