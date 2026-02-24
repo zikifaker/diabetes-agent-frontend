@@ -173,18 +173,20 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
+  background: #fff;
 }
 
 .header {
-  padding: 16px 32px;
-  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0;
 }

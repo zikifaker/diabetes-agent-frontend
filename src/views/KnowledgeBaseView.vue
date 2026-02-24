@@ -1,7 +1,10 @@
 <template>
   <div class="knowledge-base-container">
     <div class="header">
-      <h4 class="page-title">我的知识库</h4>
+      <div>
+        <h1>我的知识库</h1>
+        <p class="subtitle">建立您的知识库，让回答更有个性</p>
+      </div>
       <div class="header-actions">
         <div class="search-expand" :class="{ active: searchActive }" @click.stop>
           <input v-if="searchActive" v-model="searchQuery" class="search-input" placeholder="搜索文件"
@@ -14,14 +17,14 @@
           </button>
         </div>
 
-        <div class="tooltip-container">
+        <div class="tooltip-container" @mouseenter="showTooltip = true" @mouseleave="showTooltip = false">
           <button class="action-btn upload-btn" @click="triggerFileUpload" :disabled="uploading">
             <UploadIcon />
             {{ uploading ? '上传中...' : '上传文件' }}
+            <span class="tooltip" :class="{ 'tooltip-visible': showTooltip && !uploading }">
+              单次上传至多 10 个文件<br />每个不超过 100MB
+            </span>
           </button>
-          <div class="tooltip">
-            支持 PDF / text / Markdown <br />单次上传至多 10 个文件<br />每个不超过 100MB
-          </div>
         </div>
 
         <input ref="fileInput" type="file" @change="handleFileUpload" accept=".pdf,.md,.txt" style="display: none"
@@ -37,7 +40,7 @@
 
       <div v-else-if="knowledgeFiles.length === 0" class="empty-state">
         <EmptyStateIcon />
-        <p class="empty-state-text">暂无文件，请上传文件开始使用</p>
+        <p class="empty-state-text">暂无文件，请上传文件开始使用（支持 PDF / text / Markdown）</p>
       </div>
 
       <div v-else class="files-grid">
@@ -115,6 +118,7 @@ const fileInput = ref(null)
 const fileToDelete = ref(null)
 const showDeleteModal = ref(false)
 const activeFileMenu = ref(null)
+const showTooltip = ref(false)
 
 const toast = ref({
   show: false,
@@ -145,7 +149,6 @@ function handleSearchClick() {
 
   activateSearch()
 }
-
 function clearSearch() {
   searchQuery.value = ''
   knowledgeBaseStore.resetFiles()
@@ -162,6 +165,7 @@ function activateSearch() {
 }
 
 function triggerFileUpload() {
+  showTooltip.value = false
   fileInput.value?.click()
 }
 
@@ -335,14 +339,17 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 24px 32px;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.page-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .header-actions {
@@ -457,7 +464,7 @@ onUnmounted(() => {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.tooltip-container:hover .tooltip {
+.tooltip.tooltip-visible {
   visibility: visible;
   opacity: 1;
   transform: translateX(-50%) translateY(0);

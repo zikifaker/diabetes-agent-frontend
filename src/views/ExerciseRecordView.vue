@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>运动记录</h1>
-        <p class="subtitle">通过日历快速定位每日运动情况</p>
+        <p class="subtitle">查看您的每日运动情况</p>
       </div>
 
       <div class="header-actions">
@@ -261,8 +261,8 @@ onMounted(fetchMonthRecords)
 }
 
 .page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 

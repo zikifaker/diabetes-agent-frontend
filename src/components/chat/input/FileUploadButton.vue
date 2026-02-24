@@ -1,13 +1,13 @@
 <template>
   <div class="file-upload-container">
-    <div class="tooltip-container">
+    <div class="tooltip-container" @mouseenter="showTooltip = true" @mouseleave="showTooltip = false">
       <button @click="triggerFileInput" class="icon-button" :disabled="disabled" :class="{ 'disabled': disabled }">
         <FileUploadIcon :class="{ 'disabled-icon': disabled }" />
       </button>
-      <div class="tooltip" v-if="!disabled">
+      <div class="tooltip" :class="{ 'tooltip-visible': showTooltip && !disabled }" v-if="!disabled">
         支持 PNG / JPG / JEPG / GIF / WEBP / Word / PDF / Excel / txt / Markdown<br />单次上传至多 10 个文件，每个不超过 100MB
       </div>
-      <div class="tooltip" v-else>
+      <div class="tooltip" :class="{ 'tooltip-visible': showTooltip && disabled }" v-else>
         当前页面不支持上传文件
       </div>
     </div>
@@ -45,6 +45,7 @@ const props = defineProps({
 const emit = defineEmits(['file-upload'])
 
 const fileInput = ref(null)
+const showTooltip = ref(false)
 
 const toast = ref({
   show: false,
@@ -53,6 +54,7 @@ const toast = ref({
 })
 
 const triggerFileInput = () => {
+  showTooltip.value = false
   fileInput.value.click()
 }
 
@@ -125,12 +127,6 @@ function showToast(message, type) {
   display: inline-block;
 }
 
-.tooltip-container:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
 .tooltip {
   visibility: hidden;
   width: auto;
@@ -152,6 +148,12 @@ function showToast(message, type) {
   pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tooltip.tooltip-visible {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .tooltip::after {

@@ -3,7 +3,7 @@
     <header class="report-header">
       <div>
         <h1>健康周报</h1>
-        <p class="date-range">查看您的健康周报历史记录</p>
+        <p class="date-range">查收您的健康周报</p>
       </div>
       <div class="notification-toggle">
         <span class="notification-text">邮件通知</span>
@@ -143,8 +143,8 @@ onMounted(async () => {
 }
 
 .report-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .notification-toggle {

@@ -186,8 +186,8 @@ onMounted(async () => {
 }
 
 .analysis-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .date-range {
