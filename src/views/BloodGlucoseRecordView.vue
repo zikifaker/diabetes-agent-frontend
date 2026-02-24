@@ -126,7 +126,7 @@ function showToast(message, type = 'success') {
     message,
     type
   }
-  setTimeout(() => {toast.value.show = false}, 1500)
+  setTimeout(() => { toast.value.show = false }, 1500)
 }
 
 watch(rangeType, (newType) => {
@@ -145,16 +145,10 @@ watch(rangeType, (newType) => {
 watch(customDateRange, async (newCustom) => {
   const start = dayjs(newCustom.start)
   const end = dayjs(newCustom.end)
-  const defaultStart = dayjs().subtract(29, 'days').startOf('day')
-  const defaultEnd = dayjs().endOf('day')
-
-  // 若自定义日期范围不在最近 30 天内，则重新获取数据
-  if (start.isBefore(defaultStart) || end.isAfter(defaultEnd)) {
-    try {
-      await bloodGlucoseStore.fetchRecords(start.toISOString(), end.toISOString())
-    } catch (error) {
-      console.error('Failed to fetch blood glucose records:', error)
-    }
+  try {
+    await bloodGlucoseStore.fetchRecords(start.toISOString(), end.toISOString())
+  } catch (error) {
+    console.error('Failed to fetch blood glucose records:', error)
   }
 }, { deep: true })
 
