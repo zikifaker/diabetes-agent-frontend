@@ -1,102 +1,88 @@
 <template>
   <div class="knowledge-base-container">
-    <div class="header">
-      <div>
-        <h1>我的知识库</h1>
-        <p class="subtitle">建立您的知识库，让回答更有个性</p>
-      </div>
-      <div class="header-actions">
-        <div class="search-expand" :class="{ active: searchActive }" @click.stop>
-          <input v-if="searchActive" v-model="searchQuery" class="search-input" placeholder="搜索文件"
-            @keyup.enter="handleSearch" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" />
 
-          <button class="search-trigger" @click="handleSearchClick">
-            <CloseIcon v-if="searchActive && searchQuery" @click.stop="clearSearch" />
-            <SearchIcon v-else />
-            <span v-if="!searchActive">搜索文件</span>
+    <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
+      <div class="header">
+        <div class="header-left">
+          <button @click="toggleSidebar" class="btn-icon" aria-label="切换侧边栏">
+            <MenuSidebarToggleIcon :rotated="!sidebarVisible" />
           </button>
-        </div>
 
-        <div class="tooltip-container" @mouseenter="showTooltip = true" @mouseleave="showTooltip = false">
-          <button class="action-btn upload-btn" @click="triggerFileUpload" :disabled="uploading">
-            <UploadIcon />
-            {{ uploading ? '上传中...' : '上传文件' }}
-            <span class="tooltip" :class="{ 'tooltip-visible': showTooltip && !uploading }">
-              单次上传至多 10 个文件<br />每个不超过 100MB
-            </span>
-          </button>
-        </div>
-
-        <input ref="fileInput" type="file" @change="handleFileUpload" accept=".pdf,.md,.txt" style="display: none"
-          multiple />
-      </div>
-    </div>
-
-    <div class="content">
-      <div v-if="loading" class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>加载中...</p>
-      </div>
-
-      <div v-else-if="knowledgeFiles.length === 0" class="empty-state">
-        <EmptyStateIcon />
-        <p class="empty-state-text">暂无文件，请上传文件开始使用（支持 PDF / text / Markdown）</p>
-      </div>
-
-      <div v-else class="files-grid">
-        <div v-for="file in knowledgeFiles" :key="file.fileName" class="file-card">
-          <div class="card-actions" :class="{ 'menu-open': activeFileMenu === file.fileName }">
-            <button class="menu-trigger" @click.stop="toggleFileMenu(file.fileName)">
-              <MenuIcon />
-            </button>
-            <div v-if="activeFileMenu === file.fileName" class="file-menu">
-              <div class="menu-item" @click="handleDownload(file.fileName)">下载</div>
-              <div class="menu-item danger" @click="handleDelete(file.fileName)">删除</div>
-            </div>
-          </div>
-          <div>
-            <div v-if="file.fileType === 'pdf'" class="file-thumbnail pdf-thumbnail">
-              <span class="file-extension">PDF</span>
-            </div>
-            <div v-else-if="file.fileType === 'md'" class="file-thumbnail md-thumbnail">
-              <span class="file-extension">Markdown</span>
-            </div>
-            <div v-else class="file-thumbnail default-thumbnail">
-              <span class="file-extension">{{ getFileExtension(file.fileName) }}</span>
-            </div>
-          </div>
-          <div class="file-info">
-            <div class="file-name">{{ file.fileName }}</div>
-            <div class="file-meta">{{ formatFileSize(file.fileSize) }}</div>
+          <div class="header-titles">
+            <h1>我的知识库</h1>
+            <p class="subtitle">建立您的知识库，让回答更有个性</p>
           </div>
         </div>
-      </div>
-    </div>
 
-    <Teleport to="body">
-      <div v-if="showDeleteModal" class="modal-overlay" @click.self="cancelDelete">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>确认删除文件吗？</h3>
-            <button @click="cancelDelete" class="close-button">
-              <CloseIcon />
+        <div class="header-actions">
+          <div class="search-expand" :class="{ active: searchActive }" @click.stop>
+            <input v-if="searchActive" v-model="searchQuery" class="search-input" placeholder="搜索文件"
+              @keyup.enter="handleSearch" />
+
+            <button class="search-trigger" @click="handleSearchClick">
+              <CloseIcon v-if="searchActive && searchQuery" @click.stop="clearSearch" />
+              <SearchIcon v-else />
+              <span v-if="!searchActive">搜索文件</span>
             </button>
           </div>
-          <div class="modal-body">
-            <p>删除后文件将无法恢复，请谨慎操作</p>
+
+          <div class="tooltip-container" @mouseenter="showTooltip = true" @mouseleave="showTooltip = false">
+            <button class="action-btn upload-btn" @click="triggerFileUpload" :disabled="uploading">
+              <UploadIcon />
+              {{ uploading ? '上传中...' : '上传文件' }}
+              <span class="tooltip" :class="{ 'tooltip-visible': showTooltip && !uploading }">
+                单次上传至多 10 个文件<br />每个不超过 100MB
+              </span>
+            </button>
           </div>
-          <div class="modal-footer">
-            <button @click="cancelDelete" class="btn btn-cancel">取消</button>
-            <button @click="confirmDelete" class="btn btn-delete-confirm">删除</button>
+
+          <input ref="fileInput" type="file" @change="handleFileUpload" accept=".pdf,.md,.txt" style="display: none"
+            multiple />
+        </div>
+      </div>
+
+      <div class="content">
+        <div v-if="loading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>加载中...</p>
+        </div>
+
+        <div v-else-if="knowledgeFiles.length === 0" class="empty-state">
+          <EmptyStateIcon />
+          <p class="empty-state-text">暂无文件，请上传文件开始使用（支持 PDF / text / Markdown）</p>
+        </div>
+
+        <div v-else class="files-grid">
+          <div v-for="file in knowledgeFiles" :key="file.fileName" class="file-card">
+            <div class="card-actions" :class="{ 'menu-open': activeFileMenu === file.fileName }">
+              <button class="menu-trigger" @click.stop="toggleFileMenu(file.fileName)">
+                <MenuIcon />
+              </button>
+              <div v-if="activeFileMenu === file.fileName" class="file-menu">
+                <div class="menu-item" @click="handleDownload(file.fileName)">下载</div>
+                <div class="menu-item danger" @click="handleDelete(file.fileName)">删除</div>
+              </div>
+            </div>
+            <div>
+              <div v-if="file.fileType === 'pdf'" class="file-thumbnail pdf-thumbnail">
+                <span class="file-extension">PDF</span>
+              </div>
+              <div v-else-if="file.fileType === 'md'" class="file-thumbnail md-thumbnail">
+                <span class="file-extension">Markdown</span>
+              </div>
+              <div v-else class="file-thumbnail default-thumbnail">
+                <span class="file-extension">{{ getFileExtension(file.fileName) }}</span>
+              </div>
+            </div>
+            <div class="file-info">
+              <div class="file-name">{{ file.fileName }}</div>
+              <div class="file-meta">{{ formatFileSize(file.fileSize) }}</div>
+            </div>
           </div>
         </div>
       </div>
-    </Teleport>
-
-    <div v-if="toast.show" class="toast"
-      :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
-      {{ toast.message }}
-    </div>
+    </main>
   </div>
 </template>
 
@@ -107,9 +93,13 @@ import { storeToRefs } from 'pinia'
 import { SearchIcon, UploadIcon, EmptyStateIcon } from '@/assets/icons/knowledge-base'
 import { CloseIcon, MenuIcon } from '@/assets/icons/common'
 import { getPresignedURL, NAMESPACE } from '@/utils/oss'
+import { MenuSidebar } from '@/components/sidebar'
+import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
 const knowledgeBaseStore = useKnowledgeBaseStore()
 const { knowledgeFiles, loading, uploading } = storeToRefs(knowledgeBaseStore)
+
+const sidebarVisible = ref(true)
 
 const searchActive = ref(false)
 const searchQuery = ref('')
@@ -125,6 +115,10 @@ const toast = ref({
   message: '',
   type: 'success'
 })
+
+function toggleSidebar() {
+  sidebarVisible.value = !sidebarVisible.value
+}
 
 async function handleSearch() {
   if (!searchQuery.value.trim()) return
@@ -149,6 +143,7 @@ function handleSearchClick() {
 
   activateSearch()
 }
+
 function clearSearch() {
   searchQuery.value = ''
   knowledgeBaseStore.resetFiles()
@@ -330,8 +325,21 @@ onUnmounted(() => {
 .knowledge-base-container {
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: #f4f7fa;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.main-content.sidebar-hidden {
+  margin-left: 0;
 }
 
 .header {
@@ -341,20 +349,57 @@ onUnmounted(() => {
   padding: 24px 32px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.header-titles {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+
 .header h1 {
   font-size: 20px;
   font-weight: 600;
 }
 
 .subtitle {
-  margin-top: 6px;
+  margin-top: 0;
   font-size: 14px;
   color: var(--text-secondary);
 }
 
-.header-actions {
+.btn-icon {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background: rgba(17, 24, 39, 0.08);
+  color: var(--text-primary);
+}
+
+.btn-icon:active {
+  background: rgba(17, 24, 39, 0.14);
 }
 
 .search-expand {
@@ -394,7 +439,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   height: 100%;
-  padding: 0 12px;
+  padding: 0 14px;
   border: none;
   background: transparent;
   color: var(--text-primary);
@@ -411,7 +456,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   background: var(--white);

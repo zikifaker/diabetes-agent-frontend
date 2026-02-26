@@ -1,51 +1,61 @@
 <template>
-  <div class="report-wrapper">
-    <header class="report-header">
-      <div>
-        <h1>健康周报</h1>
-        <p class="date-range">查收您的健康周报</p>
-      </div>
-      <div class="notification-toggle">
-        <span class="notification-text">邮件通知</span>
-        <label class="switch">
-          <input type="checkbox" :checked="user?.enableNotification" @change="toggleNotification">
-          <span class="slider round"></span>
-        </label>
-      </div>
-    </header>
+  <div class="report-container">
+    <MenuSidebar :sidebar-visible="sidebarVisible" />
 
-    <div class="report-list" v-if="!loading && reports.length > 0">
-      <div v-for="report in reports" :key="report.startAt" class="report-item">
-        <div class="report-info">
-          <h3>健康周报</h3>
-          <p class="report-date">{{ formatDateRange(report.startAt, report.endAt) }}</p>
-        </div>
-        <div class="action-buttons">
-          <button class="preview-btn" @click="previewReport(report)">
-            <EyeIcon class="btn-icon" />
-            <span>预览</span>
+    <main class="report-wrapper" :class="{ 'sidebar-hidden': !sidebarVisible }">
+      <header class="report-header">
+        <div class="header-left">
+          <button @click="toggleSidebar" class="btn-icon" aria-label="切换侧边栏">
+            <MenuSidebarToggleIcon :rotated="!sidebarVisible" />
           </button>
-          <button class="download-btn" @click="downloadReport(report)">
-            <DownloadIcon class="btn-icon" />
-            <span>下载</span>
-          </button>
+
+          <div class="header-titles">
+            <h1>健康周报</h1>
+          </div>
+        </div>
+
+        <div class="notification-toggle">
+          <span class="notification-text">邮件通知</span>
+          <label class="switch">
+            <input type="checkbox" :checked="user?.enableNotification" @change="toggleNotification">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </header>
+
+      <div class="report-list" v-if="!loading && reports.length > 0">
+        <div v-for="report in reports" :key="report.startAt" class="report-item">
+          <div class="report-info">
+            <h3>健康周报</h3>
+            <p class="report-date">{{ formatDateRange(report.startAt, report.endAt) }}</p>
+          </div>
+          <div class="action-buttons">
+            <button class="preview-btn" @click="previewReport(report)">
+              <EyeIcon class="btn-icon" />
+              <span>预览</span>
+            </button>
+            <button class="download-btn" @click="downloadReport(report)">
+              <DownloadIcon class="btn-icon" />
+              <span>下载</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div v-else-if="loading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>加载中...</p>
-    </div>
+      <div v-else-if="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
 
-    <div v-else class="empty-state">
-      <p>暂无数据</p>
-    </div>
+      <div v-else class="empty-state">
+        <p>暂无数据</p>
+      </div>
 
-    <div v-if="toast.show" class="toast"
-      :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
-      {{ toast.message }}
-    </div>
+      <div v-if="toast.show" class="toast"
+        :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
+        {{ toast.message }}
+      </div>
+    </main>
   </div>
 </template>
 
@@ -57,18 +67,26 @@ import { useHealthWeeklyReportStore } from '@/stores/health_weekly_report'
 import { useAuthStore } from '@/stores/auth'
 import { DownloadIcon, EyeIcon } from '@/assets/icons/health-weekly-report'
 import { getPresignedURL, NAMESPACE } from '@/utils/oss'
+import { MenuSidebar } from '@/components/sidebar'
+import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
 const healthWeeklyReportStore = useHealthWeeklyReportStore()
 const authStore = useAuthStore()
 
 const { reports, loading } = storeToRefs(healthWeeklyReportStore)
-const user = computed(() => authStore.user)
+const sidebarVisible = ref(true)
 
 const toast = ref({
   show: false,
   message: '',
   type: 'success'
 })
+
+const user = computed(() => authStore.user)
+
+function toggleSidebar() {
+  sidebarVisible.value = !sidebarVisible.value
+}
 
 const formatDateRange = (start, end) => {
   return `${dayjs(start).format('YYYY-MM-DD')} 至 ${dayjs(end).format('YYYY-MM-DD')}`
@@ -129,22 +147,52 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.report-wrapper {
+.report-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
   background: #f4f7fa;
-  min-height: 100vh;
+}
+
+.report-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  overflow: hidden;
   padding: 24px 32px;
+}
+
+.report-wrapper.sidebar-hidden {
+  margin-left: 0;
 }
 
 .report-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
+  min-height: 40px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.header-titles {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .report-header h1 {
   font-size: 20px;
   font-weight: 600;
+  margin-top: 0;
 }
 
 .notification-toggle {
@@ -212,10 +260,25 @@ input:checked+.slider:before {
   transform: translateX(20px);
 }
 
-.date-range {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #718096;
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background: rgba(17, 24, 39, 0.08);
+  color: var(--text-primary);
+}
+
+.btn-icon:active {
+  background: rgba(17, 24, 39, 0.14);
 }
 
 .report-list {
@@ -283,11 +346,6 @@ input:checked+.slider:before {
   color: white;
   border-color: #3b82f6;
   box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
-}
-
-.btn-icon {
-  width: 14px;
-  height: 14px;
 }
 
 .toast {

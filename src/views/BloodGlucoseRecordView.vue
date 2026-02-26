@@ -1,53 +1,63 @@
 <template>
-  <div class="analysis-wrapper">
-    <header class="analysis-header">
-      <div>
-        <h1>血糖记录</h1>
-        <p class="date-range">数据范围：{{ displayDateRange }}</p>
-      </div>
+  <div class="analysis-container">
+    <MenuSidebar :sidebar-visible="sidebarVisible" />
 
-      <div class="header-actions">
-        <button class="add-btn" @click="showAddButton = true">
-          <NewIcon />
-          <span>记录血糖</span>
-        </button>
-      </div>
-    </header>
+    <main class="analysis-wrapper" :class="{ 'sidebar-hidden': !sidebarVisible }">
+      <header class="analysis-header">
+        <div class="header-left">
+          <button @click="toggleSidebar" class="btn-icon" aria-label="切换侧边栏">
+            <MenuSidebarToggleIcon :rotated="!sidebarVisible" />
+          </button>
 
-    <AddRecordForm :show="showAddButton" @close="handleClose" @save="handleSave" />
-
-    <TimeRangeSelector v-model:rangeType="rangeType" v-model:customRange="customDateRange" />
-
-    <TargetRateCard :records="filteredRecords" :lowThreshold="lowBloodGlucose" :highThreshold="highBloodGlucose" />
-
-    <div class="chart-grid">
-      <section class="chart-card">
-        <h3 class="card-title">每日平均血糖</h3>
-        <div class="chart-container">
-          <DailyAverageChart :records="filteredRecords" />
-        </div>
-      </section>
-
-      <section class="chart-card">
-        <div class="card-header">
-          <h3 class="card-title">单日血糖波动</h3>
-          <div class="date-picker-wrapper">
-            <CalendarIcon class="calendar-icon" />
-            <input type="date" v-model="selectedDate" class="date-picker"
-              :min="dayjs(customDateRange.start).format('YYYY-MM-DD')"
-              :max="dayjs(customDateRange.end).format('YYYY-MM-DD')" />
+          <div class="header-titles">
+            <h1>血糖记录</h1>
+            <p class="date-range">数据范围：{{ displayDateRange }}</p>
           </div>
         </div>
-        <div class="chart-container">
-          <DailyFluctuationChart :records="filteredRecords" :date="selectedDate" />
-        </div>
-      </section>
-    </div>
 
-    <div v-if="toast.show" class="toast"
-      :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
-      {{ toast.message }}
-    </div>
+        <div class="header-actions">
+          <button class="add-btn" @click="showAddButton = true">
+            <NewIcon />
+            <span>记录血糖</span>
+          </button>
+        </div>
+      </header>
+
+      <AddRecordForm :show="showAddButton" @close="handleClose" @save="handleSave" />
+
+      <TimeRangeSelector v-model:rangeType="rangeType" v-model:customRange="customDateRange" />
+
+      <TargetRateCard :records="filteredRecords" :lowThreshold="lowBloodGlucose" :highThreshold="highBloodGlucose" />
+
+      <div class="chart-grid">
+        <section class="chart-card">
+          <h3 class="card-title">每日平均血糖</h3>
+          <div class="chart-container">
+            <DailyAverageChart :records="filteredRecords" />
+          </div>
+        </section>
+
+        <section class="chart-card">
+          <div class="card-header">
+            <h3 class="card-title">单日血糖波动</h3>
+            <div class="date-picker-wrapper">
+              <CalendarIcon class="calendar-icon" />
+              <input type="date" v-model="selectedDate" class="date-picker"
+                :min="dayjs(customDateRange.start).format('YYYY-MM-DD')"
+                :max="dayjs(customDateRange.end).format('YYYY-MM-DD')" />
+            </div>
+          </div>
+          <div class="chart-container">
+            <DailyFluctuationChart :records="filteredRecords" :date="selectedDate" />
+          </div>
+        </section>
+      </div>
+
+      <div v-if="toast.show" class="toast"
+        :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
+        {{ toast.message }}
+      </div>
+    </main>
   </div>
 </template>
 
@@ -59,9 +69,13 @@ import { useBloodGlucoseStore } from '@/stores/blood_glucose'
 import { TimeRangeSelector, AddRecordForm, TargetRateCard, DailyAverageChart, DailyFluctuationChart } from '@/components/blood-glucose'
 import { CalendarIcon } from '@/assets/icons/blood-glucose'
 import { NewIcon } from '@/assets/icons/common'
+import { MenuSidebar } from '@/components/sidebar'
+import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
 const bloodGlucoseStore = useBloodGlucoseStore()
 const { records } = storeToRefs(bloodGlucoseStore)
+
+const sidebarVisible = ref(true)
 
 const showAddButton = ref(false)
 const rangeType = ref('1d')
@@ -93,6 +107,10 @@ const filteredRecords = computed(() => {
     return recordTime.isAfter(start) && recordTime.isBefore(end)
   })
 })
+
+function toggleSidebar() {
+  sidebarVisible.value = !sidebarVisible.value
+}
 
 const handleClose = () => {
   showAddButton.value = false
@@ -166,17 +184,45 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.analysis-wrapper {
+.analysis-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
   background: #f4f7fa;
-  min-height: 100vh;
+}
+
+.analysis-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  overflow: hidden;
   padding: 24px 32px;
+}
+
+.analysis-wrapper.sidebar-hidden {
+  margin-left: 0;
 }
 
 .analysis-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.header-titles {
+  display: flex;
   align-items: flex-end;
-  margin-bottom: 12px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .analysis-header h1 {
@@ -185,13 +231,35 @@ onMounted(async () => {
 }
 
 .date-range {
-  margin-top: 10px;
+  margin-top: 0;
   font-size: 14px;
   color: #718096;
 }
 
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background: rgba(17, 24, 39, 0.08);
+  color: var(--text-primary);
+}
+
+.btn-icon:active {
+  background: rgba(17, 24, 39, 0.14);
+}
+
 .header-actions {
   display: flex;
+  align-items: center;
   gap: 12px;
 }
 
@@ -199,7 +267,7 @@ onMounted(async () => {
   background: #3182ce;
   color: white;
   border: none;
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 10px;
   font-weight: 500;
   cursor: pointer;

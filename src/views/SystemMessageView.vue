@@ -1,95 +1,105 @@
 <template>
   <div class="system-message-container">
-    <div class="header">
-      <h4 class="page-title">消息中心</h4>
-    </div>
+    <MenuSidebar :sidebar-visible="sidebarVisible" />
 
-    <div class="main-layout">
-      <aside class="side-nav">
-        <div class="nav-item" :class="{ active: currentTab === 'all' }">
-          全部消息
+    <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
+      <div class="header">
+        <div class="header-left">
+          <button @click="toggleSidebar" class="btn-icon" aria-label="切换侧边栏">
+            <MenuSidebarToggleIcon :rotated="!sidebarVisible" />
+          </button>
+
+          <h1 class="page-title">消息中心</h1>
         </div>
-      </aside>
+      </div>
 
-      <div class="content">
-        <div v-if="messages.length === 0" class="empty-state">
-          <p class="empty-state-text">暂无消息通知</p>
-        </div>
+      <div class="main-layout">
+        <aside class="side-nav">
+          <div class="nav-item" :class="{ active: currentTab === 'all' }">
+            全部消息
+          </div>
+        </aside>
 
-        <div v-else class="message-list-wrapper">
-          <div class="message-list">
-            <div v-for="msg in messages" :key="msg.id" class="message-item" @click="handleMessageClick(msg)">
-
-              <div class="dot-wrapper">
-                <div class="message-dot" v-if="!msg.isRead"></div>
-              </div>
-
-              <div class="message-content-wrapper">
-                <div class="message-header">
-                  <span class="message-title">{{ msg.title }}</span>
-                  <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
-                </div>
-                <div class="message-body">{{ msg.content }}</div>
-              </div>
-
-              <button class="delete-btn" @click.stop="handleDeleteMessage(msg.id)">
-                <TrashIcon />
-              </button>
-            </div>
+        <div class="content">
+          <div v-if="messages.length === 0" class="empty-state">
+            <p class="empty-state-text">暂无消息通知</p>
           </div>
 
-          <div class="pagination">
-            <button class="page-btn" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">
-              &lt;
-            </button>
-            <div class="page-numbers">
-              <span v-for="p in totalPages" :key="p" class="page-num" :class="{ active: currentPage === p }"
-                @click="changePage(p)">
-                {{ p }}
-              </span>
+          <div v-else class="message-list-wrapper">
+            <div class="message-list">
+              <div v-for="msg in messages" :key="msg.id" class="message-item" @click="handleMessageClick(msg)">
+
+                <div class="dot-wrapper">
+                  <div class="message-dot" v-if="!msg.isRead"></div>
+                </div>
+
+                <div class="message-content-wrapper">
+                  <div class="message-header">
+                    <span class="message-title">{{ msg.title }}</span>
+                    <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+                  </div>
+                  <div class="message-body">{{ msg.content }}</div>
+                </div>
+
+                <button class="delete-btn" @click.stop="handleDeleteMessage(msg.id)">
+                  <TrashIcon />
+                </button>
+              </div>
             </div>
-            <button class="page-btn" :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">
-              &gt;
-            </button>
+
+            <div class="pagination">
+              <button class="page-btn" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">
+                &lt;
+              </button>
+              <div class="page-numbers">
+                <span v-for="p in totalPages" :key="p" class="page-num" :class="{ active: currentPage === p }"
+                  @click="changePage(p)">
+                  {{ p }}
+                </span>
+              </div>
+              <button class="page-btn" :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">
+                &gt;
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="toast.show" class="toast" :class="`toast-${toast.type}`">
-      {{ toast.message }}
-    </div>
+      <div v-if="toast.show" class="toast" :class="`toast-${toast.type}`">
+        {{ toast.message }}
+      </div>
 
-    <Teleport to="body">
-      <Transition name="fade">
-        <div v-if="selectedMessage" class="message-modal-overlay" @click.self="selectedMessage = null">
-          <div class="modal-card">
-            <div class="modal-header">
-              <div class="title-section">
-                <h3>{{ selectedMessage.title }}</h3>
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="selectedMessage" class="message-modal-overlay" @click.self="selectedMessage = null">
+            <div class="modal-card">
+              <div class="modal-header">
+                <div class="title-section">
+                  <h3>{{ selectedMessage.title }}</h3>
+                </div>
+                <button class="close-icon-btn" @click="selectedMessage = null">
+                  <CloseIcon />
+                </button>
               </div>
-              <button class="close-icon-btn" @click="selectedMessage = null">
-                <CloseIcon />
-              </button>
-            </div>
 
-            <div class="modal-body">
-              <div class="meta-info">
-                <span class="time-label">发布时间：</span>
-                <span class="time-value">{{ formatTime(selectedMessage.createdAt) }}</span>
+              <div class="modal-body">
+                <div class="meta-info">
+                  <span class="time-label">发布时间：</span>
+                  <span class="time-value">{{ formatTime(selectedMessage.createdAt) }}</span>
+                </div>
+                <div class="content-box">
+                  <p class="message-text">{{ selectedMessage.content }}</p>
+                </div>
               </div>
-              <div class="content-box">
-                <p class="message-text">{{ selectedMessage.content }}</p>
-              </div>
-            </div>
 
-            <div class="modal-footer">
-              <button class="btn-confirm" @click="selectedMessage = null">确认</button>
+              <div class="modal-footer">
+                <button class="btn-confirm" @click="selectedMessage = null">确认</button>
+              </div>
             </div>
           </div>
-        </div>
-      </Transition>
-    </Teleport>
+        </Transition>
+      </Teleport>
+    </main>
   </div>
 </template>
 
@@ -99,10 +109,13 @@ import { useSystemMessageStore } from '@/stores/system_message'
 import { storeToRefs } from 'pinia'
 import { TrashIcon, CloseIcon } from '@/assets/icons/common'
 import dayjs from 'dayjs'
+import { MenuSidebar } from '@/components/sidebar'
+import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
 const messageStore = useSystemMessageStore()
 const { messages, totalPages } = storeToRefs(messageStore)
 
+const sidebarVisible = ref(true)
 const currentPage = ref(1)
 const currentTab = ref('all')
 const selectedMessage = ref(null)
@@ -112,6 +125,10 @@ const toast = ref({
   message: '',
   type: 'success'
 })
+
+function toggleSidebar() {
+  sidebarVisible.value = !sidebarVisible.value
+}
 
 async function fetchMessages(page = 1) {
   try {
@@ -172,16 +189,56 @@ onMounted(() => {
 .system-message-container {
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: #fff;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.main-content.sidebar-hidden {
+  margin-left: 0;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 30px 32px;
   border-bottom: 1px solid #e2e8f0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background: rgba(17, 24, 39, 0.08);
+  color: var(--text-primary);
+}
+
+.btn-icon:active {
+  background: rgba(17, 24, 39, 0.14);
 }
 
 .page-title {

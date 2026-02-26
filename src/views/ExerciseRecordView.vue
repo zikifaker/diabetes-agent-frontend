@@ -1,88 +1,98 @@
 <template>
-  <div class="exercise-wrapper">
-    <header class="page-header">
-      <div>
-        <h1>运动记录</h1>
-        <p class="subtitle">查看您的每日运动情况</p>
-      </div>
+  <div class="exercise-container">
+    <MenuSidebar :sidebar-visible="sidebarVisible" />
 
-      <div class="header-actions">
-        <div class="month-switcher">
-          <button class="nav-btn" @click="changeMonth(-1)" aria-label="上一个月">
-            <span>‹</span>
+    <main class="exercise-wrapper" :class="{ 'sidebar-hidden': !sidebarVisible }">
+      <header class="page-header">
+        <div class="header-left">
+          <button @click="toggleSidebar" class="btn-icon" aria-label="切换侧边栏">
+            <MenuSidebarToggleIcon :rotated="!sidebarVisible" />
           </button>
-          <div class="month-label">{{ monthLabel }}</div>
-          <button class="nav-btn" @click="changeMonth(1)" aria-label="下一个月">
-            <span>›</span>
-          </button>
-        </div>
-      </div>
-    </header>
 
-    <section class="content">
-      <div class="calendar-panel">
-        <div class="calendar-head">
-          <span v-for="day in weekdays" :key="day">{{ day }}</span>
+          <div class="header-titles">
+            <h1>运动记录</h1>
+            <p class="subtitle">查看您的每日运动情况</p>
+          </div>
         </div>
 
-        <div class="calendar-grid">
-          <button v-for="day in calendarDays" :key="day.date.format('YYYY-MM-DD')" class="day-cell" :class="{
-            'out-month': !day.isCurrentMonth,
-            today: day.isToday,
-            selected: day.date.isSame(selectedDate, 'day')
-          }" @click="selectDate(day.date)">
-            <span class="day-number">{{ day.date.date() }}</span>
-            <span class="record-count" v-if="day.count">{{ day.count }} 条</span>
-          </button>
+        <div class="header-actions">
+          <div class="month-switcher">
+            <button class="nav-btn" @click="changeMonth(-1)" aria-label="上一个月">
+              <span>‹</span>
+            </button>
+            <div class="month-label">{{ monthLabel }}</div>
+            <button class="nav-btn" @click="changeMonth(1)" aria-label="下一个月">
+              <span>›</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div class="records-panel">
-        <div class="panel-header">
-          <div>
-            <h3>{{ selectedDateLabel }}</h3>
-            <p class="panel-subtitle">
-              {{ dailyRecords.length ? `共有 ${dailyRecords.length} 条记录` : '暂无记录' }}
-            </p>
+      <section class="content">
+        <div class="calendar-panel">
+          <div class="calendar-head">
+            <span v-for="day in weekdays" :key="day">{{ day }}</span>
           </div>
 
-          <button class="ghost-btn" @click="openAddModal">
-            <NewIcon />
-            <span>添加记录</span>
-          </button>
+          <div class="calendar-grid">
+            <button v-for="day in calendarDays" :key="day.date.format('YYYY-MM-DD')" class="day-cell" :class="{
+              'out-month': !day.isCurrentMonth,
+              today: day.isToday,
+              selected: day.date.isSame(selectedDate, 'day')
+            }" @click="selectDate(day.date)">
+              <span class="day-number">{{ day.date.date() }}</span>
+              <span class="record-count" v-if="day.count">{{ day.count }} 条</span>
+            </button>
+          </div>
         </div>
 
-        <div v-if="dailyRecords.length" class="records-list">
-          <div v-for="record in dailyRecords" :key="record.id" class="record-card" @click="openDetail(record)">
+        <div class="records-panel">
+          <div class="panel-header">
             <div>
-              <p class="record-name">{{ record.name || '未命名' }}</p>
-              <p class="record-meta">{{ formatTimeRange(record) }}</p>
+              <h3>{{ selectedDateLabel }}</h3>
+              <p class="panel-subtitle">
+                {{ dailyRecords.length ? `共有 ${dailyRecords.length} 条记录` : '暂无记录' }}
+              </p>
             </div>
-            <div class="record-actions">
-              <div class="record-type">{{ getExerciseTypeLabel(record.type) }}</div>
-              <button class="delete-btn" @click.stop="handleDelete(record.id)" title="删除记录">
-                <TrashIcon />
-              </button>
+
+            <button class="ghost-btn" @click="openAddModal">
+              <NewIcon />
+              <span>添加记录</span>
+            </button>
+          </div>
+
+          <div v-if="dailyRecords.length" class="records-list">
+            <div v-for="record in dailyRecords" :key="record.id" class="record-card" @click="openDetail(record)">
+              <div>
+                <p class="record-name">{{ record.name || '未命名' }}</p>
+                <p class="record-meta">{{ formatTimeRange(record) }}</p>
+              </div>
+              <div class="record-actions">
+                <div class="record-type">{{ getExerciseTypeLabel(record.type) }}</div>
+                <button class="delete-btn" @click.stop="handleDelete(record.id)" title="删除记录">
+                  <TrashIcon />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div v-else class="empty-state">
-          <p>当前日期暂无运动记录</p>
-          <button class="primary-link" @click="openAddModal">去记录</button>
+          <div v-else class="empty-state">
+            <p>当前日期暂无运动记录</p>
+            <button class="primary-link" @click="openAddModal">去记录</button>
+          </div>
         </div>
+      </section>
+
+      <RecordDetailModal :show="showDetailModal" :record="activeRecord" @close="closeDetail" />
+
+      <AddRecordForm :show="showAddModal" :defaultDate="selectedDate" :saving="saving" @close="closeAddModal"
+        @submit="handleSaveRecord" />
+
+      <div v-if="toast.show" class="toast"
+        :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
+        {{ toast.message }}
       </div>
-    </section>
-
-    <RecordDetailModal :show="showDetailModal" :record="activeRecord" @close="closeDetail" />
-
-    <AddRecordForm :show="showAddModal" :defaultDate="selectedDate" :saving="saving" @close="closeAddModal"
-      @submit="handleSaveRecord" />
-
-    <div v-if="toast.show" class="toast"
-      :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
-      {{ toast.message }}
-    </div>
+    </main>
   </div>
 </template>
 
@@ -94,9 +104,13 @@ import { useExerciseStore } from '@/stores/exercise'
 import { NewIcon, TrashIcon } from '@/assets/icons/common'
 import { AddRecordForm, RecordDetailModal } from '@/components/exercise'
 import { getExerciseTypeLabel } from '@/constants/exercise'
+import { MenuSidebar } from '@/components/sidebar'
+import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
 const exerciseStore = useExerciseStore()
 const { records } = storeToRefs(exerciseStore)
+
+const sidebarVisible = ref(true)
 
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 const currentMonth = ref(dayjs().startOf('month').toDate())
@@ -156,6 +170,10 @@ const dailyRecords = computed(() => {
       return aTime - bTime
     })
 })
+
+function toggleSidebar() {
+  sidebarVisible.value = !sidebarVisible.value
+}
 
 function changeMonth(delta) {
   currentMonth.value = dayjs(currentMonth.value).add(delta, 'month').toDate()
@@ -246,18 +264,46 @@ onMounted(fetchMonthRecords)
 </script>
 
 <style scoped>
+.exercise-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #f5f7fb;
+}
+
 .exercise-wrapper {
   --panel-height: 520px;
-  min-height: 100vh;
-  background: #f5f7fb;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+  overflow: hidden;
   padding: 24px 32px 48px;
+}
+
+.exercise-wrapper.sidebar-hidden {
+  margin-left: 0;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.header-titles {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  min-width: 0;
 }
 
 .page-header h1 {
@@ -267,9 +313,30 @@ onMounted(fetchMonthRecords)
 }
 
 .subtitle {
-  margin-top: 6px;
+  margin-top: 0;
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background: rgba(17, 24, 39, 0.08);
+  color: var(--text-primary);
+}
+
+.btn-icon:active {
+  background: rgba(17, 24, 39, 0.14);
 }
 
 .header-actions {
@@ -289,13 +356,14 @@ onMounted(fetchMonthRecords)
 }
 
 .month-label {
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .nav-btn {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
