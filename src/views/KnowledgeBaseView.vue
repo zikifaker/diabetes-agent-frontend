@@ -83,7 +83,32 @@
         </div>
       </div>
     </main>
+
+    <div v-if="toast.show" class="toast"
+      :class="{ 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error' }">
+      {{ toast.message }}
+    </div>
   </div>
+
+  <Teleport to="body">
+    <div v-if="showDeleteModal" class="modal-overlay" @click.self="cancelDelete">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>确认删除当前文件吗？</h3>
+          <button @click="cancelDelete" class="close-button">
+            <CloseIcon />
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>删除后文件无法恢复和找回，请谨慎操作</p>
+        </div>
+        <div class="modal-footer">
+          <button @click="cancelDelete" class="btn btn-cancel">取消</button>
+          <button @click="confirmDelete" class="btn btn-delete-confirm">删除</button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
