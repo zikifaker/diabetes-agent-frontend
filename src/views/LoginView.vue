@@ -19,7 +19,14 @@
         </div>
         <div v-if="loginType === 'password'" class="form-group">
           <label>密码</label>
-          <input v-model="password" type="password" placeholder="输入密码" required minlength="6" />
+          <div class="password-input-wrapper">
+            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="输入密码" required
+              minlength="6" class="password-input" />
+            <button type="button" class="password-toggle-btn" @click="showPassword = !showPassword">
+              <EyeOpenIcon v-if="showPassword" />
+              <EyeCloseIcon v-else />
+            </button>
+          </div>
         </div>
         <div v-else class="form-group">
           <label>验证码</label>
@@ -57,6 +64,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { EyeOpenIcon, EyeCloseIcon } from '@/assets/icons/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -64,6 +72,7 @@ const authStore = useAuthStore()
 const loginType = ref('password')
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const code = ref('')
 const isEmailValid = ref(false)
 const countdown = ref(0)
@@ -217,6 +226,37 @@ const startCountdown = () => {
   box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
 }
 
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #64748b;
+  border-radius: 4px;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-color);
+}
+
 .code-input-group {
   display: flex;
   gap: 0.5rem;
@@ -227,8 +267,7 @@ const startCountdown = () => {
 }
 
 .code-btn {
-  min-width: 100px;
-  background-color: #f9f3f1;
+  background-color: #f3f4f6;
   border: 1px solid #e2e8f0;
   border-radius: 0.375rem;
   padding: 0 0.75rem;
@@ -236,8 +275,13 @@ const startCountdown = () => {
   transition: all 0.2s;
 }
 
+.code-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: var(--primary-color);
+}
+
 .code-btn:disabled {
-  background-color: #e2e8f0;
+  background-color: #f3f4f6;
   cursor: not-allowed;
 }
 

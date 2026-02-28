@@ -12,7 +12,26 @@
 
         <div class="form-group">
           <label>密码</label>
-          <input v-model="password" type="password" placeholder="输入密码（至少6位）" required minlength="6" />
+          <div class="password-input-wrapper">
+            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="输入密码（至少6位）" required
+              minlength="6" class="password-input" />
+            <button type="button" class="password-toggle-btn" @click="showPassword = !showPassword">
+              <EyeOpenIcon v-if="showPassword" />
+              <EyeCloseIcon v-else />
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>确认密码</label>
+          <div class="password-input-wrapper">
+            <input v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" placeholder="确认密码" required
+              minlength="6" class="password-input" />
+            <button type="button" class="password-toggle-btn" @click="showConfirmPassword = !showConfirmPassword">
+              <EyeOpenIcon v-if="showConfirmPassword" />
+              <EyeCloseIcon v-else />
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="btn-primary" :disabled="loading">
@@ -40,12 +59,16 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { EyeOpenIcon, EyeCloseIcon } from '@/assets/icons/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
 
@@ -53,6 +76,13 @@ let errorTimer = null
 
 async function handleRegister() {
   if (errorTimer) clearTimeout(errorTimer)
+
+  // 校验密码是否一致
+  if (password.value !== confirmPassword.value) {
+    error.value = '两次输入的密码不一致'
+    errorTimer = setTimeout(() => { error.value = '' }, 2000)
+    return
+  }
 
   loading.value = true
   error.value = ''
@@ -62,7 +92,7 @@ async function handleRegister() {
     router.push('/')
   } catch (err) {
     error.value = '注册失败'
-    errorTimer = setTimeout(() => {error.value = ''}, 2000)
+    errorTimer = setTimeout(() => { error.value = '' }, 2000)
   } finally {
     loading.value = false
   }
@@ -131,6 +161,37 @@ async function handleRegister() {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #64748b;
+  border-radius: 4px;
+}
+
+.password-toggle-btn:hover {
+  background-color: #f3f4f6;
+  color: var(--primary-color);
 }
 
 .btn-primary {
