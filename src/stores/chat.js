@@ -172,7 +172,7 @@ export const useChat = defineStore('chat', () => {
     if (abortController.value) {
       abortController.value.abort()
       if (streamingMessage.value) {
-        streamingMessage.value.content += '\n\n[会话已由用户停止]'
+        streamingMessage.value.content += '\n\n**[当前会话已被用户停止]**'
         finishStreaming()
       }
     }

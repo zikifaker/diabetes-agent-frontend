@@ -32,13 +32,13 @@ const routes = [
   },
   {
     path: '/records/glucose',
-    name: 'BloodGlucose',
+    name: 'BloodGlucoseRecord',
     component: () => import('@/views/BloodGlucoseRecordView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/records/exercise',
-    name: 'Exercise',
+    name: 'ExerciseRecord',
     component: () => import('@/views/ExerciseRecordView.vue'),
     meta: { requiresAuth: true }
   },
