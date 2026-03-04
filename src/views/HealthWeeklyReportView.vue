@@ -1,6 +1,6 @@
 <template>
   <div class="report-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat" />
 
     <main class="report-wrapper" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <header class="report-header">
@@ -61,6 +61,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useHealthWeeklyReportStore } from '@/stores/health_weekly_report'
@@ -70,6 +71,7 @@ import { getPresignedURL, NAMESPACE } from '@/utils/oss'
 import { MenuSidebar } from '@/components/sidebar'
 import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
+const router = useRouter()
 const healthWeeklyReportStore = useHealthWeeklyReportStore()
 const authStore = useAuthStore()
 
@@ -83,6 +85,10 @@ const toast = ref({
 })
 
 const user = computed(() => authStore.user)
+
+async function handleNewChat() {
+  router.push(`/`)
+}
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
@@ -264,6 +270,8 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   color: var(--text-secondary);
   transition: var(--transition);

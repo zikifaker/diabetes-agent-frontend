@@ -1,6 +1,6 @@
 <template>
   <div class="exercise-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat" />
 
     <main class="exercise-wrapper" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <header class="page-header">
@@ -98,6 +98,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { storeToRefs } from 'pinia'
 import { useExerciseStore } from '@/stores/exercise'
@@ -107,6 +108,7 @@ import { getExerciseTypeLabel } from '@/constants/exercise'
 import { MenuSidebar } from '@/components/sidebar'
 import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
+const router = useRouter()
 const exerciseStore = useExerciseStore()
 const { records } = storeToRefs(exerciseStore)
 
@@ -170,6 +172,10 @@ const dailyRecords = computed(() => {
       return aTime - bTime
     })
 })
+
+async function handleNewChat() {
+  router.push(`/`)
+}
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

@@ -1,6 +1,6 @@
 <template>
   <div class="knowledge-base-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat" />
 
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <div class="header">
@@ -113,6 +113,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useKnowledgeBaseStore } from '@/stores/knowledge_base'
 import { storeToRefs } from 'pinia'
 import { SearchIcon, UploadIcon, EmptyStateIcon } from '@/assets/icons/knowledge-base'
@@ -121,6 +122,7 @@ import { getPresignedURL, NAMESPACE } from '@/utils/oss'
 import { MenuSidebar } from '@/components/sidebar'
 import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
+const router = useRouter()
 const knowledgeBaseStore = useKnowledgeBaseStore()
 const { knowledgeFiles, loading, uploading } = storeToRefs(knowledgeBaseStore)
 
@@ -140,6 +142,10 @@ const toast = ref({
   message: '',
   type: 'success'
 })
+
+async function handleNewChat() {
+  router.push(`/`)
+}
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

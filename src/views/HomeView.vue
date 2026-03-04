@@ -49,7 +49,7 @@ const { isLoading, initialMessage } = storeToRefs(chatStore)
 
 const llmOptions = LLM_OPTIONS
 const selectedLLM = ref(llmOptions[0])
-const sidebarVisible = ref(false)
+const sidebarVisible = ref(true)
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

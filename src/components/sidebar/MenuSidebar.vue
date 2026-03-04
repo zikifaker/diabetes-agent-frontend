@@ -1,9 +1,9 @@
 <template>
   <aside class="sidebar" :class="{ hidden: !sidebarVisible }">
     <div class="sidebar-header">
-      <button @click="$emit('new-chat')" class="btn-new-chat">
+      <button @click="$emit('new-chat')" class="menu-button">
         <NewChatIcon />
-        <span class="btn-text">新对话</span>
+        <span class="menu-text">新对话</span>
       </button>
 
       <router-link to="/knowledgebase" class="menu-button">
@@ -288,7 +288,7 @@ onUnmounted(() => {
 }
 
 .sidebar-header {
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -306,23 +306,6 @@ onUnmounted(() => {
   gap: 10px;
 }
 
-.btn-new-chat {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--primary-color);
-  color: white;
-  border-radius: var(--radius);
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: var(--transition);
-  border: none;
-  cursor: pointer;
-}
-
 .menu-button {
   margin-top: 8px;
   display: flex;
@@ -336,19 +319,15 @@ onUnmounted(() => {
 }
 
 .menu-button:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: var(--primary-color);
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--primary-hover);
   font-weight: 500;
 }
 
-button.menu-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
-  font-size: inherit;
+.menu-button.router-link-active {
+  background-color: rgba(59, 130, 246, 0.18);
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .sessions-list {
@@ -696,10 +675,6 @@ button.menu-button {
   font-size: 0.85rem;
   color: var(--text-primary);
   font-weight: 500;
-}
-
-.btn-text {
-  line-height: 1;
 }
 
 @media (max-width: 768px) {

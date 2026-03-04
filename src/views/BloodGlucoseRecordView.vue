@@ -1,6 +1,6 @@
 <template>
   <div class="analysis-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat" />
 
     <main class="analysis-wrapper" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <header class="analysis-header">
@@ -63,6 +63,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
 import { useBloodGlucoseStore } from '@/stores/blood_glucose'
@@ -72,6 +73,7 @@ import { NewIcon } from '@/assets/icons/common'
 import { MenuSidebar } from '@/components/sidebar'
 import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
+const router = useRouter()
 const bloodGlucoseStore = useBloodGlucoseStore()
 const { records } = storeToRefs(bloodGlucoseStore)
 
@@ -107,6 +109,10 @@ const filteredRecords = computed(() => {
     return recordTime.isAfter(start) && recordTime.isBefore(end)
   })
 })
+
+async function handleNewChat() {
+  router.push(`/`)
+}
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value

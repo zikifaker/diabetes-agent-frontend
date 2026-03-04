@@ -1,6 +1,6 @@
 <template>
   <div class="system-message-container">
-    <MenuSidebar :sidebar-visible="sidebarVisible" />
+    <MenuSidebar :sidebar-visible="sidebarVisible" @new-chat="handleNewChat" />
 
     <main class="main-content" :class="{ 'sidebar-hidden': !sidebarVisible }">
       <div class="header">
@@ -105,6 +105,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSystemMessageStore } from '@/stores/system_message'
 import { storeToRefs } from 'pinia'
 import { TrashIcon, CloseIcon } from '@/assets/icons/common'
@@ -112,6 +113,7 @@ import dayjs from 'dayjs'
 import { MenuSidebar } from '@/components/sidebar'
 import { MenuSidebarToggleIcon } from '@/assets/icons/navigation'
 
+const router = useRouter()
 const messageStore = useSystemMessageStore()
 const { messages, totalPages } = storeToRefs(messageStore)
 
@@ -125,6 +127,10 @@ const toast = ref({
   message: '',
   type: 'success'
 })
+
+async function handleNewChat() {
+  router.push(`/`)
+}
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
