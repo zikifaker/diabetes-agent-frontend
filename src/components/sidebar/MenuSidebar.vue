@@ -350,7 +350,6 @@ onUnmounted(() => {
 }
 
 .sessions-list {
-  margin-top: -15px;
   flex: 1;
   overflow-y: auto;
   padding: 8px;
