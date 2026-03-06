@@ -1,6 +1,10 @@
 <template>
   <aside class="sidebar" :class="{ hidden: !sidebarVisible }">
     <div class="sidebar-header">
+      <h1 class="site-title">Diabetes Agent</h1>
+    </div>
+
+    <div class="sidebar-menu">
       <button @click="$emit('new-chat')" class="menu-button">
         <NewChatIcon />
         <span class="menu-text">新对话</span>
@@ -288,7 +292,22 @@ onUnmounted(() => {
 }
 
 .sidebar-header {
-  padding: 20px;
+  padding: 20px 20px 10px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.site-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  letter-spacing: 0.3px;
+  opacity: 0.9;
+}
+
+.sidebar-menu {
+  padding: 10px 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
