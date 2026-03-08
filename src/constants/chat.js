@@ -19,7 +19,7 @@ export const LLM_OPTIONS = [
 export const MCP_TOOL_OPTIONS = [
   {
     label: '糖尿病知识图谱',
-    value: 'search_diabetes_knowledge_graph',
+    value: 'search_diabetes_kg',
     description: '查询基于 DiaKG 构建的知识图谱，包括临床研究、药物使用、临床病例、诊断和治疗方法等'
   },
   {
