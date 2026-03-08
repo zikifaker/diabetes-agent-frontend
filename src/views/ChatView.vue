@@ -14,8 +14,8 @@
 
           <div class="messages-scroll" ref="messagesContainer" @scroll="handleScroll">
             <div class="messages-container">
-              <MessageBubble v-for="message in sessionStore.messages" :key="message.createdAt" :message="message"
-                @show-tool-calls="showToolCallSidebar" />
+              <MessageBubble v-for="(message, idx) in sessionStore.messages" :key="message.createdAt" :message="message"
+                :data-message-idx="idx" @show-tool-calls="showToolCallSidebar" />
 
               <MessageBubble v-if="streamingMessage" :message="streamingMessage" :streaming="isLoading"
                 @show-tool-calls="showToolCallSidebar" />
@@ -24,6 +24,20 @@
 
           <ChatInput @send="onSend" @stop="chatStore.handleStop" :loading="isLoading" :model="selectedLLM.id" />
         </div>
+
+        <div class="message-navigator" v-if="userMessages.length > 0">
+          <div class="nav-dots-container">
+            <div v-for="msg in userMessages" :key="msg.idx" class="nav-dot"
+              :class="{ 'active': activeUserMessageIdx === msg.idx }"
+              :style="{ marginBottom: getNavDotSpacing(msg.aiMessageLength) + 'px' }" @click="scrollToMessage(msg.idx)"
+              @mouseenter="hoveredUserMessage = msg" @mouseleave="hoveredUserMessage = null">
+              <div v-if="hoveredUserMessage?.idx === msg.idx" class="nav-tooltip">
+                {{ msg.preview }}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <ToolCallSidebar :visible="isToolCallSidebarVisible" :results="currentToolCallResults"
           @close="closeToolCallSidebar" />
       </div>
@@ -32,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/stores/session'
@@ -58,10 +72,30 @@ const {
 } = storeToRefs(chatStore)
 
 const sidebarVisible = ref(true)
+
 const isToolCallSidebarVisible = ref(false)
 const currentToolCallResults = ref([])
+
 const llmOptions = LLM_OPTIONS
 const selectedLLM = ref(llmOptions[0])
+
+const hoveredUserMessage = ref(null)
+const activeUserMessageIdx = ref(-1)
+
+const userMessages = computed(() => {
+  const messages = sessionStore.messages
+  const result = []
+  for (let i = 0; i < messages.length; i += 2) {
+    const msg = messages[i]
+    result.push({
+      idx: i,
+      preview: msg.content.slice(0, 50) + (msg.content.length > 50 ? '...' : ''),
+      fullContent: msg.content,
+      aiMessageLength: messages[i + 1].content.length
+    })
+  }
+  return result
+})
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
@@ -106,6 +140,25 @@ function closeToolCallSidebar() {
   isToolCallSidebarVisible.value = false
 }
 
+// 根据 AI 消息长度计算导航点间距
+// 基础间距 12px，每 100 字符增加 2px 间距，最大间距 40px
+function getNavDotSpacing(length) {
+  if (length === 0) return 12
+  const spacing = Math.min(12 + Math.floor(length / 100) * 2, 40)
+  return spacing
+}
+
+function scrollToMessage(idx) {
+  const el = messagesContainer.value?.querySelector(`[data-message-idx="${idx}"]`)
+  if (el) {
+    el.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
+    activeUserMessageIdx.value = idx
+  }
+}
+
 onMounted(async () => {
   const sessionId = route.params.id
   if (!sessionId) return
@@ -133,9 +186,6 @@ onMounted(async () => {
     if (session) {
       sessionStore.setCurrentSession(session)
     }
-
-    await nextTick()
-    chatStore.scrollToBottom()
   }
 })
 
@@ -166,9 +216,6 @@ watch(() => route.params.id, async (newId) => {
       if (session) {
         sessionStore.setCurrentSession(session)
       }
-
-      await nextTick()
-      chatStore.scrollToBottom()
     }
   } catch (error) {
     console.error('Error fetching session messages:', error)
@@ -239,21 +286,11 @@ watch(() => route.params.id, async (newId) => {
   flex: 1;
   overflow-y: auto;
   padding: 24px 0;
-  scrollbar-color: rgba(84, 143, 206, 0.25) transparent;
   scrollbar-gutter: stable;
 }
 
 .messages-scroll::-webkit-scrollbar {
-  width: 8px;
-}
-
-.messages-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.messages-scroll::-webkit-scrollbar-track {
-  background: transparent;
+  display: none;
 }
 
 .messages-container {
@@ -264,5 +301,64 @@ watch(() => route.params.id, async (newId) => {
 
 .messages-container::-webkit-scrollbar {
   display: none;
+}
+
+.message-navigator {
+  width: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  background: transparent;
+}
+
+.nav-dots-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--hover-bg);
+  border-radius: 12px;
+  height: 100vh;
+  width: 20px;
+  padding: 8px 12px;
+}
+
+.nav-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.6);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.nav-dot:hover {
+  background: rgba(84, 143, 206, 0.8);
+  transform: scale(1.2);
+}
+
+.nav-dot.active {
+  background: rgba(84, 143, 206, 1);
+  transform: scale(1.2);
+}
+
+.nav-tooltip {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  color: black;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 10px;
+  white-space: nowrap;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 1000;
 }
 </style>

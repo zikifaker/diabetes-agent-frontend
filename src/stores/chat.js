@@ -185,7 +185,6 @@ export const useChat = defineStore('chat', () => {
     messagesContainer,
     initialMessage,
     handleSend,
-    handleStop,
-    scrollToBottom
+    handleStop
   }
 })
