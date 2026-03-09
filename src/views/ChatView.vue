@@ -28,9 +28,9 @@
         <div class="message-navigator" v-if="userMessages.length > 0">
           <div class="nav-dots-container">
             <div v-for="msg in userMessages" :key="msg.idx" class="nav-dot"
-              :class="{ 'active': activeUserMessageIdx === msg.idx }"
-              :style="{ marginBottom: getNavDotSpacing(msg.aiMessageLength) + 'px' }" @click="scrollToMessage(msg.idx)"
-              @mouseenter="hoveredUserMessage = msg" @mouseleave="hoveredUserMessage = null">
+              :class="{ 'active': activeUserMessageIdx === msg.idx }" :style="{ top: msg.top + '%' }"
+              @click="scrollToMessage(msg.idx)" @mouseenter="hoveredUserMessage = msg"
+              @mouseleave="hoveredUserMessage = null">
               <div v-if="hoveredUserMessage?.idx === msg.idx" class="nav-tooltip">
                 {{ msg.preview }}
               </div>
@@ -85,17 +85,34 @@ const activeUserMessageIdx = ref(-1)
 const userMessages = computed(() => {
   const messages = sessionStore.messages
   const result = []
+
+  let totalAILength = 0
+  for (let i = 1; i < messages.length; i += 2) {
+    totalAILength += messages[i].content.length
+  }
+
+  const safeTotalLength = totalAILength || 1
+  let currentAccumulatedLength = 0
+
   for (let i = 0; i < messages.length; i += 2) {
-    const msg = messages[i]
+    const userMsg = messages[i]
+    const aiMsg = messages[i + 1]
+
+    // 计算当前 dot 高度占总长度的百分比
+    const topPercent = (currentAccumulatedLength / safeTotalLength) * 100
+
     result.push({
       idx: i,
-      preview: msg.content.slice(0, 50) + (msg.content.length > 50 ? '...' : ''),
-      fullContent: msg.content,
-      aiMessageLength: messages[i + 1].content.length
+      preview: userMsg.content.slice(0, 50) + (userMsg.content.length > 50 ? '...' : ''),
+      top: topPercent
     })
+
+    if (aiMsg) {
+      currentAccumulatedLength += aiMsg.content.length
+    }
   }
-  return result
-})
+  return result;
+});
 
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
@@ -304,43 +321,40 @@ watch(() => route.params.id, async (newId) => {
 }
 
 .message-navigator {
-  width: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 0;
-  background: transparent;
+  width: 40px;
+  height: calc(100vh - 120px);
+  position: sticky;
+  top: 60px;
+  margin-right: 8px;
 }
 
 .nav-dots-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: relative;
+  width: 18px;
+  height: 100%;
   background-color: var(--hover-bg);
   border-radius: 12px;
-  height: 100vh;
-  width: 20px;
-  padding: 8px 12px;
+  margin: 0 auto;
 }
 
 .nav-dot {
-  width: 12px;
-  height: 12px;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: rgba(148, 163, 184, 0.6);
+  background: rgba(148, 163, 184, 0.8);
+  border: 2px solid var(--white);
   cursor: pointer;
-  position: relative;
   transition: all 0.2s ease;
+  z-index: 10;
 }
 
-.nav-dot:hover {
-  background: rgba(84, 143, 206, 0.8);
-  transform: scale(1.2);
-}
-
+.nav-dot:hover,
 .nav-dot.active {
-  background: rgba(84, 143, 206, 1);
-  transform: scale(1.2);
+  background: #548fce;
+  transform: translate(-50%, -50%) scale(1.3);
 }
 
 .nav-tooltip {
