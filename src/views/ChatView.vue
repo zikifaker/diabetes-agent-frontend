@@ -157,14 +157,6 @@ function closeToolCallSidebar() {
   isToolCallSidebarVisible.value = false
 }
 
-// 根据 AI 消息长度计算导航点间距
-// 基础间距 12px，每 100 字符增加 2px 间距，最大间距 40px
-function getNavDotSpacing(length) {
-  if (length === 0) return 12
-  const spacing = Math.min(12 + Math.floor(length / 100) * 2, 40)
-  return spacing
-}
-
 function scrollToMessage(idx) {
   const el = messagesContainer.value?.querySelector(`[data-message-idx="${idx}"]`)
   if (el) {
