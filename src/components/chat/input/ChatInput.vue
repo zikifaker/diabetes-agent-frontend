@@ -3,6 +3,10 @@
     <AgentConfigModal v-model:show="showConfig" v-model:config="agentConfig" :tools-options="toolsOptions"
       @close="showConfig = false" />
 
+    <button v-if="showScrollToBottom" @click="scrollToBottom" class="scroll-to-bottom-btn" aria-label="滚动至消息底部">
+      <ArrowDownIcon />
+    </button>
+
     <div class="input-area">
       <div class="input-pill">
         <FileUploadPreview :files="uploadedFiles" @remove-file="removeFile" />
@@ -65,6 +69,7 @@ import VoiceInputButton from '@/components/chat/input/VoiceInputButton.vue'
 import FileUploadButton from '@/components/chat/input/FileUploadButton.vue'
 import FileUploadPreview from '@/components/chat/input/FileUploadPreview.vue'
 import { AgentConfigIcon, SendIcon, StopIcon, KnowledgeBaseRetrievalIcon } from '@/assets/icons/chat/input'
+import { ArrowDownIcon } from '@/assets/icons/chat/input'
 import { getUploadPolicyToken, uploadToOSS, NAMESPACE } from '@/utils/oss.js'
 import { MCP_TOOL_OPTIONS } from '@/constants/chat'
 
@@ -84,10 +89,14 @@ const props = defineProps({
   model: {
     type: String,
     default: 'qwen3-max'
+  },
+  showScrollToBottom: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['send', 'stop'])
+const emit = defineEmits(['send', 'stop', 'scroll-to-bottom'])
 
 const route = useRoute()
 
@@ -103,6 +112,10 @@ const agentConfig = ref({
   maxIterations: 5,
   tools: MCP_TOOL_OPTIONS.map(tool => tool.value)
 })
+
+function scrollToBottom() {
+  emit('scroll-to-bottom')
+}
 
 function handleSend() {
   if ((!message.value.trim() && uploadedFiles.value.length === 0) || props.loading) return
@@ -419,6 +432,36 @@ onMounted(() => {
   background-color: #e0e0e0;
   color: #9e9e9e;
   cursor: not-allowed;
+}
+
+.scroll-to-bottom-btn {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.scroll-to-bottom-btn:hover {
+  background: var(--hover-bg);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scroll-to-bottom-btn:active {
+  transform: translateX(-50%) translateY(0);
 }
 
 .btn-knowledge-base:hover .tooltip,

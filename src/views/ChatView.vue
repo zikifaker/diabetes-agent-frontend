@@ -22,7 +22,8 @@
             </div>
           </div>
 
-          <ChatInput @send="onSend" @stop="chatStore.handleStop" :loading="isLoading" :model="selectedLLM.id" />
+          <ChatInput @send="onSend" @stop="chatStore.handleStop" @scroll-to-bottom="handleScrollToBottom"
+            :loading="isLoading" :model="selectedLLM.id" :show-scroll-to-bottom="!autoScrollEnabled" />
         </div>
 
         <div class="message-navigator" v-if="userMessages.length > 0">
@@ -165,6 +166,17 @@ function scrollToMessage(idx) {
       block: 'start'
     })
     activeUserMessageIdx.value = idx
+  }
+}
+
+function handleScrollToBottom() {
+  const el = messagesContainer.value
+  if (el) {
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: 'smooth'
+    })
+    autoScrollEnabled.value = true
   }
 }
 
