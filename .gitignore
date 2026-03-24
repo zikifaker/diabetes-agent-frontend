@@ -19,13 +19,6 @@ yarn-error.log*
 *.code-workspace
 .history/
 
-# IntelliJ IDEA
-.idea/
-*.iml
-*.iws
-*.ipr
-out/
-.idea_modules/
 
 # Custom Rules
 .env
